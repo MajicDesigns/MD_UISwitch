@@ -1,0 +1,5 @@
+<map id="MD_UISwitch" name="MD_UISwitch">
+<area shape="rect" id="node3" href="$class_m_d___u_i_switch___analog.html" title="MD_UISwitch_Analog" alt="" coords="5,80,152,107"/>
+<area shape="rect" id="node5" href="$class_m_d___u_i_switch___digital.html" title="MD_UISwitch_Digital" alt="" coords="177,80,319,107"/>
+<area shape="rect" id="node7" href="$class_m_d___u_i_switch___matrix.html" title="MD_UISwitch_Matrix" alt="" coords="343,80,485,107"/>
+</map>
