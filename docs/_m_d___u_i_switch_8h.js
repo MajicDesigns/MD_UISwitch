@@ -5,6 +5,7 @@ var _m_d___u_i_switch_8h =
     [ "MD_UISwitch_Analog", "class_m_d___u_i_switch___analog.html", "class_m_d___u_i_switch___analog" ],
     [ "uiAnalogKeys_t", "struct_m_d___u_i_switch___analog_1_1ui_analog_keys__t.html", "struct_m_d___u_i_switch___analog_1_1ui_analog_keys__t" ],
     [ "MD_UISwitch_Matrix", "class_m_d___u_i_switch___matrix.html", "class_m_d___u_i_switch___matrix" ],
+    [ "MD_UISwitch_4017KM", "class_m_d___u_i_switch__4017_k_m.html", "class_m_d___u_i_switch__4017_k_m" ],
     [ "ARRAY_SIZE", "_m_d___u_i_switch_8h.html#a6242a25f9d996f0cc4f4cdb911218b75", null ],
     [ "DPRESS_ENABLE", "_m_d___u_i_switch_8h.html#a71075720e1391402294a8128b87c0299", null ],
     [ "KEY_ACTIVE_STATE", "_m_d___u_i_switch_8h.html#a31b7db8ca6c72f2c2d1f35676ed7bf1c", null ],

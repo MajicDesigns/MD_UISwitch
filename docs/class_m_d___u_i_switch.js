@@ -25,7 +25,7 @@ var class_m_d___u_i_switch =
     [ "enableRepeat", "class_m_d___u_i_switch.html#a62b4c58fe1db440e44e66d54389f588d", null ],
     [ "enableRepeatResult", "class_m_d___u_i_switch.html#ac5190407be944cb37ed0b2e9f06ee925", null ],
     [ "getKey", "class_m_d___u_i_switch.html#aac77b8bbdb44597e76a3c675c8844f7a", null ],
-    [ "processFSM", "class_m_d___u_i_switch.html#aea6bf2a239760a7a60ad525daed4d4b3", null ],
+    [ "processFSM", "class_m_d___u_i_switch.html#a87f6a0e4b6ff3da09b1a84a1cd816230", null ],
     [ "read", "class_m_d___u_i_switch.html#a617982b74a11dfa6ce5d5b0ee977abb2", null ],
     [ "setDebounceTime", "class_m_d___u_i_switch.html#a437e04ee557dbac7598529acd89be51a", null ],
     [ "setDoublePressTime", "class_m_d___u_i_switch.html#ac29e353ed13dc39671c221201ed1d8c4", null ],

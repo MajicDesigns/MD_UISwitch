@@ -32,7 +32,7 @@
    <div id="projectname">MD_UISwitch Library
    &#160;<span id="projectnumber">1.0</span>
    </div>
-   <div id="projectbrief">Library for different types of UI switches</div>
+   <div id="projectbrief">Library for different types of User Interface switches</div>
   </td>
  </tr>
  </tbody>
@@ -86,10 +86,25 @@ $(document).ready(function(){initNavTree('index.html','');});
 <div class="title"><a class="el" href="class_m_d___u_i_switch.html">MD_UISwitch</a> Library </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>This library uniformly encapsulates the use of different types of switches as user input devices.</p>
-<p>Switch types handled are: Momentary on type switches Analog resistor ladder switches Keypad matrix</p>
-<p>Additional switch types are eaily added through an extensible class model, following the existing example code.</p>
-<p>The library includes the following features: Detects press, double press, long press and auto repeat. Works with either either low/high or high/low transitions. Software debounce of initial keypress, configurable time period. Software double press detection, configurable time period. Software long press detection, configurable time period. Software auto repeat detection, configurable time period.</p>
+<div class="textblock"><p>This library uniformly encapsulates the use of different types of switches for user input devices. The library is easily extended for additional switch types through a class heirarchy and inheritance model, following the code for existing switch types.</p>
+<p>The library includes the following features:</p><ul>
+<li>Software debounce for all switch types.</li>
+<li>Automatically detect switch press, double press, long press and auto repeat.</li>
+<li>Can work with low/high or high/low transitions.</li>
+<li>All software timers are configurable for fine tuning to specific applications. These include:<ul>
+<li>debounce time.</li>
+<li>double press time.</li>
+<li>long press time.</li>
+<li>auto repeat period time.</li>
+</ul>
+</li>
+</ul>
+<p>Switch arrangements handled by the library are:</p><ul>
+<li>Momentary on type switches (MD_Switch_Digital class)</li>
+<li>Analog resistor ladder switches (MD_Switch_Analog class)</li>
+<li>Keypad matrix (MD_Switch_Matrix class)</li>
+<li>Keypad matrix using 4017 IC (MD_Matrix_4017KM class)</li>
+</ul>
 <p>See Also</p><ul>
 <li><a class="el" href="page_revision_history.html">Revision History</a></li>
 <li><a class="el" href="page_copyright.html">Copyright</a> </li>
@@ -99,7 +114,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sun Nov 5 2017 20:02:42 for MD_UISwitch Library by
+    <li class="footer">Generated on Sat Nov 11 2017 17:36:39 for MD_UISwitch Library by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

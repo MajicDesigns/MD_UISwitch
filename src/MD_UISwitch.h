@@ -3,23 +3,25 @@
 \mainpage MD_UISwitch Library
 
 This library uniformly encapsulates the use of different types of switches 
-as user input devices.
-
-Switch types handled are:
-* Momentary on type switches
-* Analog resistor ladder switches
-* Keypad matrix
-
-Additional switch types are eaily added through an extensible class model, 
-following the existing example code.
+for user input devices. The library is easily extended for additional 
+switch types through a class heirarchy and inheritance model, following 
+the code for existing switch types.
 
 The library includes the following features:
-* Detects press, double press, long press and auto repeat.
-* Works with either either low/high or high/low transitions.
-* Software debounce of initial keypress, configurable time period.
-* Software double press detection, configurable time period.
-* Software long press detection, configurable time period.
-* Software auto repeat detection, configurable time period.
+- Software debounce for all switch types.
+- Automatically detect switch press, double press, long press and auto repeat.
+- Can work with low/high or high/low transitions.
+- All software timers are configurable for fine tuning to specific applications. These include:
+ + debounce time.
+ + double press time.
+ + long press time.
+ + auto repeat period time.
+
+Switch arrangements handled by the library are:
+- Momentary on type switches (MD_Switch_Digital class)
+- Analog resistor ladder switches (MD_Switch_Analog class)
+- Keypad matrix (MD_Switch_Matrix class)
+- Keypad matrix using 4017 IC (MD_Matrix_4017KM class)
 
 See Also
 - \subpage pageRevisionHistory
@@ -158,23 +160,6 @@ public:
   * \return an identifiying index for the key item, depending on implementation
   */
   virtual uint8_t getKey(void) { return(_lastKey); };
-  
-  /**
-  * Process the key using FSM
-  *
-  * Process the key read using a finite state machine to detect the current
-  * type of keypress and return one of the keypress types.
-  *
-  * The timing for each keypress starts when the first transition of the
-  * switch from inactive to active state and is recognised by a finite
-  * state machine invoked in process() whose operation is directed by the
-  * timer and option values specified.
-  *
-  * \param bState true if the switch is active, false otherwise.
-  * \param keyID an optional identifier for the key pressed.
-  * \return one of the keyResult_t enumerated values.
-  */
-  keyResult_t processFSM(bool bState, uint8_t keyID = 0);
   /** @} */
 
   //--------------------------------------------------------------
@@ -324,11 +309,41 @@ protected:
   uint16_t  _timeLongPress; ///< long press time in milliseconds
   int16_t   _timeRepeat;    ///< repeat time delay in milliseconds
   
-  uint8_t   _lastKey;       ///< persists the last key value until a new one shows up
+  uint8_t   _lastKey;       ///< persists the last key value until a new one is detected
+
+  /**
+  * Process the key using FSM
+  *
+  * Process the key read using a finite state machine to detect the current
+  * type of keypress and return one of the keypress types.
+  *
+  * The timing for each keypress starts when the first transition of the
+  * switch from inactive to active state and is recognised by a finite
+  * state machine invoked in process() whose operation is directed by the
+  * timer and option values specified.
+  *
+  * If the reset parameter is specified the FSM is reset to the idle state
+  * and no other processing is performed (ie, the bState parameter is
+  * ignored).
+  *
+  * \param bState true if the switch is active, false otherwise.
+  * \param reset  an optional identifier to reset the FSM.
+  * \return one of the keyResult_t enumerated values.
+  */
+  keyResult_t processFSM(bool bState, bool reset = 0);
 };
 
 /**
-* Extension object for MD_UISwitch_Digital, implementing momentary ON switches
+* Extension class MD_UISwitch_Digital.
+*
+* Implements interface for momentary ON switches, such as tact switches or microswitches.
+*
+* ![Momentary On Digital Style Switches] (Digital_Switches.jpg "Digital Switches")
+*
+* Switches can be wired as pull-up or pull-down. Pull-up switches are initialised 
+* with the internal pull-up enabled. Pull-down switches require an external 
+* pull-down resistor circuit. How the switch type is initialised depends on the
+* parameters passed to the class constructor.
 */
 class MD_UISwitch_Digital: public MD_UISwitch
 {
@@ -396,7 +411,21 @@ protected:
 };
 
 /**
-* Extension object for MD_UISwitch_Analog, implementing resistor ladder switches
+* Extension class MD_UISwitch_Analog.
+*
+* Implements resistor ladder switches on analog input. This type of switch
+* are typically found on 1602 LCD module shields.
+*
+* ![LCD Shield Analog Style Switches] (lcd_shield.jpg "LCD Shield")
+*
+* All the switrches are wired to one analog input. The switch pressed is determined
+* from the analog value read from the port. This may vary depending on the 
+* implementation of the resistor, so a translation table is implemented to allow
+* the remapping of the analog value to a key number.
+*
+* The translation table must be determined separately and passed as a parameter to 
+* the class constructor. As the class does not copy this table, it must remain in 
+* scope for the life of the object.
 */
 class MD_UISwitch_Analog : public MD_UISwitch
 {
@@ -428,6 +457,10 @@ public:
   *
   * Instantiate a new instance of the class. The parameters passed are
   * used to the hardware interface to the switch.
+  *
+  * The key definitions table is not copiued by the class, so user code
+  * must ensure that the table remains in scope for the life of the object 
+  * created.
   *
   * \param pin    the analog pin to which the switches are connected.
   * \param kt     pointer to a table of analog value key definitions
@@ -479,9 +512,26 @@ protected:
   int16_t   _lastKeyIdx;  ///< index of the last key read
 };
 
-
 /**
-* Extension object for MD_UISwitch_Matrix, implementing keyboard matrix switches
+* Extension class MD_UISwitch_Matrix.
+*
+* Implements keyboard matrix switches that need to be scanned to detect a keypress.
+*
+* ![Keypad Style Switches] (Keypad_Switches.jpg "Keypad Switches")
+*
+* The class will scan a key matrix that typically have circuits and connections 
+* similar to that shown below. Each row and column is separately connected to a 
+* digital pin, and arrays of pin numbers are passed to the class constructor 
+* to allow the code to scan the matrix to determine which key has been pressed. 
+* Pins should be directly connected to the matrix without pull-up or pull-down 
+* resistors. The library does not make a copy of the pin arrays so they should 
+* remain in scope for the life of the object.
+*
+* ![4x4 Matrix Keypad Circuit] (Keypad_Circuit_4x4.jpg "Keypad Circuit")
+*
+* The class will only return a valid key press if only one key is pressed. If 
+* more than one key is pressed simultaneously, all the keys are ignored until
+* just a single key is again detected.
 */
 class MD_UISwitch_Matrix : public MD_UISwitch
 {
@@ -496,11 +546,18 @@ public:
   * Instantiate a new instance of the class. The parameters passed are
   * used to the hardware interface to the switch.
   *
+  * The class will only return a valid key if just one key is pressed. If more
+  * than one key is pressed simultaneously, all the keys are ignored until just
+  * a single key is again detected.
+  *
+  * The class does not make copies of the pin array so they should 
+  * remain in scope for the life of the object.
+  *
   * \param rows    the number of rows in the key matrix.
   * \param cols    the number of columns in the key matrix.
   * \param rowPin  array of rows elements of ordered row pins to which the switches are connected.
   * \param colPin  array of cols elements of ordered column pins to which the switches are connected.
-  * \param kt      the key table. An array of characters arranged in by column then row. 
+  * \param kt      the key table. An array of characters arranged in by column then row.
   */
   MD_UISwitch_Matrix(uint8_t rows, uint8_t cols, uint8_t* rowPin, uint8_t* colPin, char* kt) :
     _rows(rows), _cols(cols), _rowPin(rowPin), _colPin(colPin), _kt(kt) {};
@@ -527,7 +584,7 @@ public:
   virtual void begin(void);
 
   /**
-  * Return the state of the switch
+  * Return the key pressed of the switch matrix
   *
   * Return one of the keypress types depending on what has been detected.
   * The timing for each keypress starts when the first transition of the
@@ -549,3 +606,92 @@ protected:
 
   int16_t   _lastKeyIdx;  ///< index of the last key read
 };
+
+/**
+* Extension class MD_UISwitch_4017KM.
+*
+* Implements keyboard matrix switches implemented using 4017 decade counter
+* (see https://arduinoplusplus.wordpress.com/2016/02/17/up-to-100-switches-with-3-digital-pins/).
+*
+* ![Key Matrix using 4017 IC] (Matrix_4017_KM.jpg "Key Matrix 4017")
+*
+* Using a 4017 IC, this class implements a method for reading many open/closed switches
+* using only three digital I/O pins (Clock, Reset and DataIn). The class will scan a key 
+* matrix that have circuits similar to that shown above. Pin numbers used are passed to 
+* the class constructor allow the code to manage the 4017 IC to determine which key has 
+* been pressed. Pins should be directly connected to the matrix without pull-up or 
+* pull-down resistors.
+*
+* The class will only detect a key if there is just one key pressed. If more than one 
+* key is pressed it will pause until just one key remains pressed.
+*/
+class MD_UISwitch_4017KM : public MD_UISwitch
+{
+public:
+  //--------------------------------------------------------------
+  /** \name Class constructor and destructor.
+  * @{
+  */
+  /**
+  * Class Constructor.
+  *
+  * Instantiate a new instance of the class. The parameters passed are
+  * used to the hardware interface to the switch.
+  *
+  * The class will only return a valid key if just one key is pressed. If more
+  * than one key is pressed simultaneously, all the keys are ignored until just
+  * a single key is again detected.
+  *
+  * \param numKeys the number of keys in the 4017 matrix (rows*columns).
+  * \param pinClk  pin number for the 4017 clock pin, LOW to HIGH transition.
+  * \param pinRst  pin number for the 4017 reset pin (0 if not used), LOW to HIGH transition.
+  * \param pinKey  pin number for the key switch output to Arduino, HIGH means key is pressed.
+  */
+  MD_UISwitch_4017KM(uint8_t numKeys, uint8_t pinClk, uint8_t pinKey, uint8_t pinRst) :
+    _numKeys(numKeys), _pinClk(pinClk), _pinKey(pinKey), _pinRst(pinRst) {};
+  
+  /**
+  * Class Destructor.
+  *
+  * Release allocated memory and does the necessary to clean up once the queue is
+  * no longer required.
+  */
+  ~MD_UISwitch_4017KM() {};
+  /** @} */
+
+  //--------------------------------------------------------------
+  /** \name Methods for core object control.
+  * @{
+  */
+  /**
+  * Initialize the object.
+  *
+  * Initialise the object data. This needs to be called during setup() to initialise new
+  * data for the class that cannot be done during the object creation.
+  */
+  virtual void begin(void);
+
+  /**
+  * Return the key pressed of the switch matrix
+  *
+  * Return one of the keypress types depending on what has been detected.
+  * The timing for each keypress starts when the first transition of the
+  * switch from inactive to active state and is recognised by a finite
+  * state machine whose operation is directed by the timer and option
+  * values specified.
+  *
+  * \return one of the keyResult_t enumerated values
+  */
+  virtual keyResult_t read(void);
+  /** @} */
+
+protected:
+  uint8_t  _numKeys; ///< total number of keys
+  uint8_t  _pinClk;  ///< 4017 clock pin, LOW to HIGH transition
+  uint8_t  _pinRst;  ///< 4017 reset pin (0 if not used), LOW to HIGH transition
+  uint8_t  _pinKey;  ///< key switch output to Arduino, HIGH means key is pressed	
+
+  void reset(void);  ///< reset the 4017 IC
+  void clock(void);  ///< clock the 4017 IC
+};
+

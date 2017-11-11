@@ -1,7 +1,4 @@
 var searchData=
 [
-  ['enabledoublepress',['enableDoublePress',['../class_m_d___u_i_switch.html#a0581e504add30a9763426c96bc4ffb35',1,'MD_UISwitch']]],
-  ['enablelongpress',['enableLongPress',['../class_m_d___u_i_switch.html#aaf8424f5f69243637ec296530ac57ef1',1,'MD_UISwitch']]],
-  ['enablerepeat',['enableRepeat',['../class_m_d___u_i_switch.html#a62b4c58fe1db440e44e66d54389f588d',1,'MD_UISwitch']]],
-  ['enablerepeatresult',['enableRepeatResult',['../class_m_d___u_i_switch.html#ac5190407be944cb37ed0b2e9f06ee925',1,'MD_UISwitch']]]
+  ['clock',['clock',['../class_m_d___u_i_switch__4017_k_m.html#ab4c9e22652fae972c8c892efc97a26f1',1,'MD_UISwitch_4017KM']]]
 ];

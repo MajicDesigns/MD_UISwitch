@@ -29,10 +29,16 @@ MD_UISwitch::MD_UISwitch(void) : _state(S_IDLE)
   setRepeatTime(KEY_REPEAT_TIME);
 }
 
-MD_UISwitch::keyResult_t MD_UISwitch::processFSM(bool b, uint8_t keyID)
+MD_UISwitch::keyResult_t MD_UISwitch::processFSM(bool b, bool reset)
 // return one of the keypress types depending on what has been detected
 {
   keyResult_t k = KEY_NULL;
+
+  if (reset)
+  {
+    _state = S_IDLE;
+    return;
+  }
 
   switch (_state)
   {
@@ -254,10 +260,11 @@ void MD_UISwitch_Matrix::begin(void)
 MD_UISwitch::keyResult_t MD_UISwitch_Matrix::read(void)
 {
   bool b = false;
-  uint16_t idx = -1;
+  int16_t idx = -1;
+  int16_t count = 0;
 
   // scan the keypad and stop at the first key detected
-  for (uint8_t c = 0; c < _cols && idx == -1; c++) 
+  for (uint8_t c = 0; c < _cols; c++) 
   {
     pinMode(_colPin[c], OUTPUT);
     digitalWrite(_colPin[c], LOW);	    // column pulse
@@ -265,20 +272,99 @@ MD_UISwitch::keyResult_t MD_UISwitch_Matrix::read(void)
     {
       if (digitalRead(_rowPin[r]) == LOW)
       {
-        idx = (r * _rows) + c;
-        break;
+        if (idx == -1) idx = (r * _rows) + c;
+        count++;
       }
     }
     digitalWrite(_colPin[c], HIGH);     // end column pulse
     pinMode(_colPin[c], INPUT);         // set high impedance
   }
 
-  // is this the same as the previous key?
-  b = (idx != -1) && (idx == _lastKeyIdx);
-  _lastKeyIdx = idx;
-  if (idx != -1) _lastKey = _kt[idx];
+  // if more than one key pressed, don't count anything
+  if (count > 1) idx = -1;
 
-  if (_lastKeyIdx != -1) UI_PRINT("\nKey idx ", idx);
+  if (idx != -1)  // we have a valid key
+  {
+    // is this the same as the previous key?
+    if (idx != _lastKeyIdx) processFSM(false, true); // reset the FSM
+
+    b = (idx == _lastKeyIdx);
+    _lastKeyIdx = idx;
+    _lastKey = _kt[_lastKeyIdx];
+    UI_PRINT("\nKey idx ", _lastKey);
+  }
+
+  return(processFSM(b));
+}
+// -----------------------------------------------
+
+// -----------------------------------------------
+// MD_UISwitch_4017KM methods
+// -----------------------------------------------
+void MD_UISwitch_4017KM::begin(void)
+{
+  UI_PRINTS("\nUISwitch_4017KM begin()");
+
+  // initialise the hardware
+  digitalWrite(_pinClk, LOW);
+  pinMode(_pinClk, OUTPUT);
+  pinMode(_pinKey, INPUT);
+  if (_pinRst != 0)
+  {
+    pinMode(_pinRst, OUTPUT);
+    digitalWrite(_pinRst, LOW);
+  }
+
+  MD_UISwitch::begin();
+}
+
+void MD_UISwitch_4017KM::reset(void)
+{
+  digitalWrite(_pinRst, HIGH);
+  delayMicroseconds(1);
+  digitalWrite(_pinRst, LOW);
+}
+
+void MD_UISwitch_4017KM::clock(void)
+{
+  digitalWrite(_pinClk, HIGH);
+  // delayMicroseconds(1); // may not be needed!
+  digitalWrite(_pinClk, LOW);
+}
+
+MD_UISwitch::keyResult_t MD_UISwitch_4017KM::read(void)
+
+{
+  bool b = false;
+  int16_t idx = -1;
+  int16_t count = 0;
+
+  reset();
+
+  // scan the keypad and stop at the first key detected
+  for (int16_t i = 0; i<_numKeys; i++)
+  {
+    // read and advance the counter	
+    if (digitalRead(_pinKey) == HIGH)
+    {
+      if (idx == -1) idx = i;
+      count++;
+    }
+    clock();    // advance the 4017 counter
+  }
+
+  // if more than one key pressed, don't count anything
+  if (count > 1) idx = -1;
+
+  if (idx != -1)  // we have a valid key
+  {
+    // is this the same as the previous key?
+    if (idx != _lastKey) processFSM(false, true); // reset the FSM
+
+    b = (idx == _lastKey);
+    _lastKey = idx;
+    UI_PRINT("\nKey idx ", _lastKey);
+  }
 
   return(processFSM(b));
 }

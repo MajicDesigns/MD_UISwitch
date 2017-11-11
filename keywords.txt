@@ -10,6 +10,7 @@ MD_UISwitch	KEYWORD1
 MD_UISwitch_Digital	KEYWORD1
 MD_UISwitch_Analog	KEYWORD1
 MD_UISwitch_Matrix	KEYWORD1
+MD_UISwitch_4017KM	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -26,7 +27,6 @@ enableRepeatResult	KEYWORD2
 begin	KEYWORD2
 read	KEYWORD2
 getKey	KEYWORD2
-processFSM	KEYWORD2
 
 ######################################
 # Constants (LITERAL1)
