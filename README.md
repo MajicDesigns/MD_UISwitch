@@ -19,4 +19,4 @@ Switch arrangements handled by the library are:
 - Keypad matrix using 4017 IC (MD_Matrix_4017KM class)
 
 
-[Library Documentation](https://majicdesigns.github.io/MD_UISwitch/)
+[Library Documentation](https://MajicDesigns.github.io/MD_UISwitch/)

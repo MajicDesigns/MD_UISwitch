@@ -7,10 +7,10 @@
 //
 #include <MD_UISwitch.h>
 
-// define what trype of testing is beig done
-#define TEST_DIGITAL 0
+// define what type of testing is being done
+#define TEST_DIGITAL 1
 #define TEST_ANALOG  0
-#define TEST_MATRIX_4b4  1
+#define TEST_MATRIX_4b4  0
 #define TEST_MATRIX_1b4  0
 #define TEST_MATRIX_4017KM 0
 
