@@ -6,6 +6,8 @@ See main header file for information.
 
 #include "MD_UISwitch.h"
 
+const int16_t KEY_IDX_UNDEF = -1;   ///< Index value for undefined index
+
 /**
  * \file
  * \brief Main code file for MD_UISwitch library
@@ -21,12 +23,13 @@ See main header file for information.
 #define UI_PRINT(s, v)  ///< Debugging macro
 #endif
 
-MD_UISwitch::MD_UISwitch(void) : _state(S_IDLE)
+MD_UISwitch::MD_UISwitch(void) : _state(S_IDLE), _lastKeyIdx(KEY_IDX_UNDEF)
 {
   setDebounceTime(KEY_DEBOUNCE_TIME);
   setDoublePressTime(KEY_DPRESS_TIME);
   setLongPressTime(KEY_LONGPRESS_TIME);
   setRepeatTime(KEY_REPEAT_TIME);
+  enableRepeatResult(false);
 }
 
 MD_UISwitch::keyResult_t MD_UISwitch::processFSM(bool b, bool reset)
@@ -183,18 +186,46 @@ MD_UISwitch::keyResult_t MD_UISwitch::processFSM(bool b, bool reset)
 // -----------------------------------------------
 void MD_UISwitch_Digital::begin(void)
 {
-  UI_PRINTS("\nUISwitch_Digital begin()");
-  if (_onState == LOW)
-    pinMode(_pin, INPUT_PULLUP);
-  else
-    pinMode(_pin, INPUT);
+  UI_PRINT("\nUISwitch_Digital begin() ", _pinCount);
+  UI_PRINTS(" pins");
+
+  for (uint8_t i = 0; i < _pinCount; i++)
+  {
+    if (_onState == LOW)
+      pinMode(_pins[i], INPUT_PULLUP);
+    else
+      pinMode(_pins[i], INPUT);
+  }
 
   MD_UISwitch::begin();
 }
 
 MD_UISwitch::keyResult_t MD_UISwitch_Digital::read(void)
 {
-  bool b = (digitalRead(_pin) == _onState);
+  bool b = false;
+  int16_t idx = KEY_IDX_UNDEF;
+  int16_t count = 0;
+
+  // work out which key is pressed
+  for (uint8_t i = 0; i < _pinCount; i++)
+  {
+    if (digitalRead(_pins[i]) == _onState)
+    {
+      if (idx == KEY_IDX_UNDEF) idx = i;
+      count++;
+    }
+  }
+
+  // if more than one key pressed, don't count anything
+  if (count == 1)   // we have a valid key
+  {
+    // is this the same as the previous key?
+    if (idx != _lastKeyIdx) processFSM(false, true); // reset the FSM
+
+    b = (idx == _lastKeyIdx);
+    _lastKeyIdx = _lastKey = idx;
+    UI_PRINT("\nKey idx ", _lastKeyIdx);
+  }
 
   return(processFSM(b));
 }
@@ -214,26 +245,31 @@ void MD_UISwitch_Analog::begin(void)
 MD_UISwitch::keyResult_t MD_UISwitch_Analog::read(void)
 {
   bool b = false;
-  uint8_t v = analogRead(_pin);
-  int16_t idx = -1;
+  uint16_t v = analogRead(_pin);
+  int16_t idx = KEY_IDX_UNDEF;
 
   // work out what key this is
-  for (uint8_t k = 0; k < _ktSize; k++)
+  for (uint8_t i = 0; i < _ktSize; i++)
   {
-    if ((v >= (_kt[k].adcThreshold - _kt[k].adcTolerance)) &&
-        (v <= (_kt[k].adcThreshold + _kt[k].adcTolerance)))
+    if ((v >= (_kt[i].adcThreshold - _kt[i].adcTolerance)) &&
+        (v <= (_kt[i].adcThreshold + _kt[i].adcTolerance)))
     {
-      idx = _kt[k].value;
+      idx = i;
       break;
     }
   }
 
-  // is this the same as the previous key?
-  b = (idx != -1) && (idx == _lastKeyIdx);
-  _lastKeyIdx = idx;
-  if (idx != -1) _lastKey = _kt[idx].value;
+  // is this a valid key the same as the previous key?
+  if (idx != KEY_IDX_UNDEF)
+  {
+    // is this the same as the previous key?
+    if (idx != _lastKeyIdx) processFSM(false, true); // reset the FSM
 
-  if (_lastKeyIdx != -1) UI_PRINT("\nKey idx ", idx);
+    b = (idx == _lastKeyIdx);
+    _lastKeyIdx = idx;
+    _lastKey = _kt[idx].value;
+    UI_PRINT("\nKey idx ", _lastKeyIdx);
+  }
 
   return(processFSM(b));
 }
@@ -260,7 +296,7 @@ void MD_UISwitch_Matrix::begin(void)
 MD_UISwitch::keyResult_t MD_UISwitch_Matrix::read(void)
 {
   bool b = false;
-  int16_t idx = -1;
+  int16_t idx = KEY_IDX_UNDEF;
   int16_t count = 0;
 
   // scan the keypad and stop at the first key detected
@@ -272,7 +308,7 @@ MD_UISwitch::keyResult_t MD_UISwitch_Matrix::read(void)
     {
       if (digitalRead(_rowPin[r]) == LOW)
       {
-        if (idx == -1) idx = (r * _rows) + c;
+        if (idx == KEY_IDX_UNDEF) idx = (r * _rows) + c;
         count++;
       }
     }
@@ -281,9 +317,7 @@ MD_UISwitch::keyResult_t MD_UISwitch_Matrix::read(void)
   }
 
   // if more than one key pressed, don't count anything
-  if (count > 1) idx = -1;
-
-  if (idx != -1)  // we have a valid key
+  if (count == 1)  // we have a valid key
   {
     // is this the same as the previous key?
     if (idx != _lastKeyIdx) processFSM(false, true); // reset the FSM
@@ -336,7 +370,7 @@ MD_UISwitch::keyResult_t MD_UISwitch_4017KM::read(void)
 
 {
   bool b = false;
-  int16_t idx = -1;
+  int16_t idx = KEY_IDX_UNDEF;
   int16_t count = 0;
 
   reset();
@@ -347,22 +381,20 @@ MD_UISwitch::keyResult_t MD_UISwitch_4017KM::read(void)
     // read and advance the counter	
     if (digitalRead(_pinKey) == HIGH)
     {
-      if (idx == -1) idx = i;
+      if (idx == KEY_IDX_UNDEF) idx = i;
       count++;
     }
     clock();    // advance the 4017 counter
   }
 
   // if more than one key pressed, don't count anything
-  if (count > 1) idx = -1;
-
-  if (idx != -1)  // we have a valid key
+  if (count == 1)  // we have a valid key
   {
     // is this the same as the previous key?
     if (idx != _lastKey) processFSM(false, true); // reset the FSM
 
-    b = (idx == _lastKey);
-    _lastKey = idx;
+    b = (idx == _lastKeyIdx);
+    _lastKeyIdx = _lastKey = idx;
     UI_PRINT("\nKey idx ", _lastKey);
   }
 

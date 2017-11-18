@@ -49,6 +49,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 \page pageRevisionHistory Revision History
 Revision History
 ----------------
+Nov 2017 version 1.1.0
+- Corrected keywords.txt
+- Added array of pins constructor to UISwitch_Digital
+- Corrected some switch detection code
+
 Nov 2017 version 1.0.0
 - New library created to consolidate existing MD_KeySwitch and MD_AButton libraryies
  */
@@ -310,6 +315,7 @@ protected:
   int16_t   _timeRepeat;    ///< repeat time delay in milliseconds
   
   uint8_t   _lastKey;       ///< persists the last key value until a new one is detected
+  int16_t   _lastKeyIdx;    ///< internal index of the last key read
 
   /**
   * Process the key using FSM
@@ -353,10 +359,13 @@ public:
   * @{
   */
   /**
-  * Class Constructor.
+  * Class Constructor - simple pin.
   *
   * Instantiate a new instance of the class. The parameters passed are
   * used to the hardware interface to the switch.
+  *
+  * This form of the constructor is for a simple digital pin (ie,
+  * one digital pin). 
   *
   * The option parameter onState tells the library which level
   * (LOW or HIGH) should be considered the switch 'on' state. If the
@@ -368,7 +377,30 @@ public:
   * \param onState   the state for the switch to be active
   */
   MD_UISwitch_Digital(uint8_t pin, uint8_t onState = KEY_ACTIVE_STATE) :
-  _pin(pin), _onState(onState) {};
+    _pinSimple(pin), _pins(&_pinSimple), _pinCount(1), _onState(onState) {};
+
+  /**
+  * Class Constructor - array of pins.
+  *
+  * Instantiate a new instance of the class. The parameters passed are
+  * used to the hardware interface to the switch.
+  *
+  * This form of the constructor is for an array of digital pins. The
+  * data is not copied from the user code, so the array elements need
+  * to remain in scope and constant for the life of the object.
+  *
+  * The option parameter onState tells the library which level
+  * (LOW or HIGH) should be considered the switch 'on' state. If the
+  * default LOW state is selected then the library will initialise each
+  * pin with INPUT_PULLUP and no external pullup resistors are necessary.
+  * If specified HIGH, external pull down resistors will be required.
+  *
+  * \param pins      pointer to array of pin numbers to which the switches are connected.
+  * \param pinCount  the number of pin in the pins[] array
+  * \param onState   the state for the switch to be active
+  */
+  MD_UISwitch_Digital(uint8_t *pins, uint8_t pinCount, uint8_t onState = KEY_ACTIVE_STATE) :
+    _pins(pins), _pinCount(pinCount), _onState(onState) {};
 
   /**
   * Class Destructor.
@@ -406,7 +438,9 @@ public:
   /** @} */
 
 protected:
-  uint8_t   _pin;       ///< pin number
+  uint8_t   _pinSimple; ///< pin number for simple pins
+  uint8_t   *_pins;     ///< pointer to data for one or more pins
+  uint8_t   _pinCount;  ///< number of pins defined
   uint8_t   _onState;   ///< digital state for ON
 };
 
@@ -418,14 +452,18 @@ protected:
 *
 * ![LCD Shield Analog Style Switches] (lcd_shield.jpg "LCD Shield")
 *
-* All the switrches are wired to one analog input. The switch pressed is determined
+* All the switches are wired to one analog input, genarraly with resistor values 
+* as shown in the circuit below. The switch pressed is determined
 * from the analog value read from the port. This may vary depending on the 
 * implementation of the resistor, so a translation table is implemented to allow
 * the remapping of the analog value to a key number.
 *
+* ![LCD Shield Switches Circuit] (lcd_switch_ladder.png "Analog Ladder Circuit")
+*
 * The translation table must be determined separately and passed as a parameter to 
-* the class constructor. As the class does not copy this table, it must remain in 
-* scope for the life of the object.
+* the class constructor - the utility application Test_Analog_Keys in the examples 
+* folder can be used for this purpose. The class does not copy this table to its 
+* own memory, so it must remain in scope for the life of the object.
 */
 class MD_UISwitch_Analog : public MD_UISwitch
 {
@@ -443,7 +481,7 @@ public:
   typedef struct
   {
     uint16_t  adcThreshold; ///< Average analog value of the 
-    uint8_t   adcTolerance; ///< Valid range for a key will be adcThreshold +/- Tolerance
+    uint8_t   adcTolerance; ///< Valid +/- tolerance range around adcThreshold for a key
     uint8_t   value;        ///< Identifier for this key, returned using getKey()
   } uiAnalogKeys_t;
   /** @} */
@@ -467,7 +505,7 @@ public:
   * \param ktSize number of elements in the kt table
   */
   MD_UISwitch_Analog(uint8_t pin, uiAnalogKeys_t* kt, uint8_t ktSize) :
-    _pin(pin), _kt(kt), _ktSize(ktSize), _lastKeyIdx(-1) {};
+    _pin(pin), _kt(kt), _ktSize(ktSize) {};
 
   /**
   * Class Destructor.
@@ -603,8 +641,6 @@ protected:
   uint8_t   *_rowPin;    ///< array of pins connected to the rows 
   uint8_t   *_colPin;    ///< array of pins connected to the columns
   char      *_kt;        ///< analog key values in a char string
-
-  int16_t   _lastKeyIdx;  ///< index of the last key read
 };
 
 /**

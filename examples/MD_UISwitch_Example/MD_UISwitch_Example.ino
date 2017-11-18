@@ -7,37 +7,55 @@
 //
 #include <MD_UISwitch.h>
 
-// define what type of testing is being done
-#define TEST_DIGITAL 1
+// Define what type of testing is being done
+#define TEST_DIGITAL_SIMPLE 0
+#define TEST_DIGITAL_ARRAY 0
+
 #define TEST_ANALOG  0
+
 #define TEST_MATRIX_4b4  0
 #define TEST_MATRIX_1b4  0
-#define TEST_MATRIX_4017KM 0
 
-#if TEST_DIGITAL
-const uint8_t DIGITAL_SWITCH_PIN = 4;       // switch connected to this pin
+#define TEST_MATRIX_4017KM 1
+
+#if TEST_DIGITAL_SIMPLE
+#define TITLE "Simple Digital"
+
+const uint8_t DIGITAL_SWITCH_PIN = 6;       // switch connected to this pin
 const uint8_t DIGITAL_SWITCH_ACTIVE = LOW;  // digital signal when switch is pressed 'on'
 
 MD_UISwitch_Digital S(DIGITAL_SWITCH_PIN, DIGITAL_SWITCH_ACTIVE);
 #endif
 
+#if TEST_DIGITAL_ARRAY
+#define TITLE "Array Digital"
+const uint8_t DIGITAL_SWITCH_PINS[] = { 4, 5, 6 }; // switches connected to these pins
+const uint8_t DIGITAL_SWITCH_ACTIVE = LOW;  // digital signal when switch is pressed 'on'
+
+MD_UISwitch_Digital S(DIGITAL_SWITCH_PINS, ARRAY_SIZE(DIGITAL_SWITCH_PINS), DIGITAL_SWITCH_ACTIVE);
+#endif
+
 #if TEST_ANALOG
+#define TITLE "Analaog Input"
+
 const uint8_t ANALOG_SWITCH_PIN = A0;       // switches connected to this pin
 
 // These key values work for most LCD shields
 MD_UISwitch_Analog::uiAnalogKeys_t kt[] =
 {
   {  10, 10, 'R' },  // Right
-  { 139, 15, 'U' },  // Up
-  { 315, 15, 'D' },  // Down
-  { 489, 15, 'L' },  // Left
-  { 726, 15, 'S' },  // Select
+  { 130, 15, 'U' },  // Up
+  { 305, 15, 'D' },  // Down
+  { 475, 15, 'L' },  // Left
+  { 720, 15, 'S' },  // Select
 };
 
 MD_UISwitch_Analog S(ANALOG_SWITCH_PIN, kt, ARRAY_SIZE(kt));
 #endif
 
 #if TEST_MATRIX_4b4
+#define TITLE "Matrix 4x4"
+
 uint8_t rowPins[] = { 4, 5, 6, 7 };     // connected to keypad row pinouts
 uint8_t colPins[] = { 8, 9, 10, 11 };   // connected to the keypad column pinouts
 
@@ -50,6 +68,8 @@ MD_UISwitch_Matrix S(ROWS, COLS, rowPins, colPins, kt);
 #endif
 
 #if TEST_MATRIX_1b4
+#define TITLE "Matrix 1x4"
+
 uint8_t rowPins[] = { 11 };     // connected to keypad row pinouts
 uint8_t colPins[] = { 10, 9, 8, 7, 6, 5 };   // connected to the keypad column pinouts
 
@@ -62,6 +82,8 @@ MD_UISwitch_Matrix S(ROWS, COLS, rowPins, colPins, kt);
 #endif
 
 #if TEST_MATRIX_4017KM
+#define TITLE "Matrix 4017KM"
+
 const uint8_t KM4017_CLK = 3;  // clock connected to this pin
 const uint8_t KM4017_RST = 4;  // reset connectred to this pin
 const uint8_t KM4017_OUT = 5;  // output from keypad connected here
@@ -72,7 +94,9 @@ MD_UISwitch_4017KM S(9, KM4017_CLK, KM4017_OUT, KM4017_RST);
 void setup(void)
 {
   Serial.begin(57600);
-  Serial.print("\n[MD_UISwitch example]");
+  Serial.print(F("\n[MD_UISwitch "));
+  Serial.print(F(TITLE));
+  Serial.print(F(" Example]"));
 
   S.begin();
   //S.enableDoublePress(false);
@@ -87,12 +111,12 @@ void loop(void)
 
   switch(k)
   {
-    case MD_UISwitch::KEY_NULL:      /* Serial.println("NULL"); */   break;
-    case MD_UISwitch::KEY_PRESS:     Serial.print("\nSINGLE "); break;
-    case MD_UISwitch::KEY_DPRESS:    Serial.print("\nDOUBLE "); break;
-    case MD_UISwitch::KEY_LONGPRESS: Serial.print("\nLONG   ");   break;
-    case MD_UISwitch::KEY_RPTPRESS:  Serial.print("\nREPEAT "); break;
-    default:                         Serial.print("\nUNKNWN ");      break;
+    case MD_UISwitch::KEY_NULL:      /* Serial.println("NULL"); */  break;
+    case MD_UISwitch::KEY_PRESS:     Serial.print("\nKEY_SINGLE "); break;
+    case MD_UISwitch::KEY_DPRESS:    Serial.print("\nKEY_DOUBLE "); break;
+    case MD_UISwitch::KEY_LONGPRESS: Serial.print("\nKEY_LONG   "); break;
+    case MD_UISwitch::KEY_RPTPRESS:  Serial.print("\nKEY_REPEAT "); break;
+    default:                         Serial.print("\nKEY_UNKNWN "); break;
   }
   if (k != MD_UISwitch::KEY_NULL)
   {

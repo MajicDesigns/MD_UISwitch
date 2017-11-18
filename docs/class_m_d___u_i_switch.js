@@ -33,6 +33,7 @@ var class_m_d___u_i_switch =
     [ "setRepeatTime", "class_m_d___u_i_switch.html#a758aeea794e3c2ea3b0270e7d71fc04d", null ],
     [ "_enableFlags", "class_m_d___u_i_switch.html#aa92f25ce35fc3a2f6d458ca5d9b95b56", null ],
     [ "_lastKey", "class_m_d___u_i_switch.html#afbf4adfda419da86355e31e645ce71a1", null ],
+    [ "_lastKeyIdx", "class_m_d___u_i_switch.html#a037dc1bd6b01dbfa4a2101a27913f781", null ],
     [ "_state", "class_m_d___u_i_switch.html#a637d10dfdd1ce03d0d99793024d9d13a", null ],
     [ "_timeActive", "class_m_d___u_i_switch.html#af8088c6ba1b4c581e0f04951a1017663", null ],
     [ "_timeDebounce", "class_m_d___u_i_switch.html#ae666b71094edccf25a39f53ecc311f6e", null ],

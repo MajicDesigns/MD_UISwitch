@@ -30,7 +30,7 @@
   <td id="projectlogo"><img alt="Logo" src="MajicDesigns_Logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MD_UISwitch Library
-   &#160;<span id="projectnumber">1.0</span>
+   &#160;<span id="projectnumber">1.1</span>
    </div>
    <div id="projectbrief">Library for different types of User Interface switches</div>
   </td>
@@ -113,6 +113,8 @@ Public Member Functions</h2></td></tr>
 <tr><td colspan="2"><div class="groupHeader">Class constructor and destructor.</div></td></tr>
 <tr class="memitem:a65a1949309b55b88672d8806d93b7b60"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_d___u_i_switch___digital.html#a65a1949309b55b88672d8806d93b7b60">MD_UISwitch_Digital</a> (uint8_t pin, uint8_t onState=<a class="el" href="_m_d___u_i_switch_8h.html#a31b7db8ca6c72f2c2d1f35676ed7bf1c">KEY_ACTIVE_STATE</a>)</td></tr>
 <tr class="separator:a65a1949309b55b88672d8806d93b7b60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a445ea87a4bbc15694522c6050a21c709"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_d___u_i_switch___digital.html#a445ea87a4bbc15694522c6050a21c709">MD_UISwitch_Digital</a> (uint8_t *pins, uint8_t pinCount, uint8_t onState=<a class="el" href="_m_d___u_i_switch_8h.html#a31b7db8ca6c72f2c2d1f35676ed7bf1c">KEY_ACTIVE_STATE</a>)</td></tr>
+<tr class="separator:a445ea87a4bbc15694522c6050a21c709"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f2239687ade7372ae9b7289946e19bb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_d___u_i_switch___digital.html#a7f2239687ade7372ae9b7289946e19bb">~MD_UISwitch_Digital</a> ()</td></tr>
 <tr class="separator:a7f2239687ade7372ae9b7289946e19bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Methods for core object control.</div></td></tr>
@@ -146,10 +148,18 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a2a85bf1f9ca78a3752cfd2dc4b28a3b8"><td class="memItemLeft" align="right" valign="top"><a id="a2a85bf1f9ca78a3752cfd2dc4b28a3b8"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_d___u_i_switch___digital.html#a2a85bf1f9ca78a3752cfd2dc4b28a3b8">_pin</a></td></tr>
-<tr class="memdesc:a2a85bf1f9ca78a3752cfd2dc4b28a3b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">pin number <br /></td></tr>
-<tr class="separator:a2a85bf1f9ca78a3752cfd2dc4b28a3b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e16feab3856907164eb681e492d7c87"><td class="memItemLeft" align="right" valign="top"><a id="a1e16feab3856907164eb681e492d7c87"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_d___u_i_switch___digital.html#a1e16feab3856907164eb681e492d7c87">_pinSimple</a></td></tr>
+<tr class="memdesc:a1e16feab3856907164eb681e492d7c87"><td class="mdescLeft">&#160;</td><td class="mdescRight">pin number for simple pins <br /></td></tr>
+<tr class="separator:a1e16feab3856907164eb681e492d7c87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ac21014a5660ce69ff7012ed322a6f0"><td class="memItemLeft" align="right" valign="top"><a id="a7ac21014a5660ce69ff7012ed322a6f0"></a>
+uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_d___u_i_switch___digital.html#a7ac21014a5660ce69ff7012ed322a6f0">_pins</a></td></tr>
+<tr class="memdesc:a7ac21014a5660ce69ff7012ed322a6f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">pointer to data for one or more pins <br /></td></tr>
+<tr class="separator:a7ac21014a5660ce69ff7012ed322a6f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac09e151823e20ca64eb78dd78cd98111"><td class="memItemLeft" align="right" valign="top"><a id="ac09e151823e20ca64eb78dd78cd98111"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_d___u_i_switch___digital.html#ac09e151823e20ca64eb78dd78cd98111">_pinCount</a></td></tr>
+<tr class="memdesc:ac09e151823e20ca64eb78dd78cd98111"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of pins defined <br /></td></tr>
+<tr class="separator:ac09e151823e20ca64eb78dd78cd98111"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2762c57222214677d95251a830de16e"><td class="memItemLeft" align="right" valign="top"><a id="ad2762c57222214677d95251a830de16e"></a>
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_d___u_i_switch___digital.html#ad2762c57222214677d95251a830de16e">_onState</a></td></tr>
 <tr class="memdesc:ad2762c57222214677d95251a830de16e"><td class="mdescLeft">&#160;</td><td class="mdescRight">digital state for ON <br /></td></tr>
@@ -187,6 +197,10 @@ int16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_d___u_i_switch.html#afbf4adfda419da86355e31e645ce71a1">_lastKey</a></td></tr>
 <tr class="memdesc:afbf4adfda419da86355e31e645ce71a1 inherit pro_attribs_class_m_d___u_i_switch"><td class="mdescLeft">&#160;</td><td class="mdescRight">persists the last key value until a new one is detected <br /></td></tr>
 <tr class="separator:afbf4adfda419da86355e31e645ce71a1 inherit pro_attribs_class_m_d___u_i_switch"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a037dc1bd6b01dbfa4a2101a27913f781 inherit pro_attribs_class_m_d___u_i_switch"><td class="memItemLeft" align="right" valign="top"><a id="a037dc1bd6b01dbfa4a2101a27913f781"></a>
+int16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_d___u_i_switch.html#a037dc1bd6b01dbfa4a2101a27913f781">_lastKeyIdx</a></td></tr>
+<tr class="memdesc:a037dc1bd6b01dbfa4a2101a27913f781 inherit pro_attribs_class_m_d___u_i_switch"><td class="mdescLeft">&#160;</td><td class="mdescRight">internal index of the last key read <br /></td></tr>
+<tr class="separator:a037dc1bd6b01dbfa4a2101a27913f781 inherit pro_attribs_class_m_d___u_i_switch"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -229,7 +243,7 @@ Momentary On Digital Style Switches</div></div>
 <p> Switches can be wired as pull-up or pull-down. Pull-up switches are initialised with the internal pull-up enabled. Pull-down switches require an external pull-down resistor circuit. How the switch type is initialised depends on the parameters passed to the class constructor. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a65a1949309b55b88672d8806d93b7b60"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a65a1949309b55b88672d8806d93b7b60">&#9670;&nbsp;</a></span>MD_UISwitch_Digital()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a65a1949309b55b88672d8806d93b7b60">&#9670;&nbsp;</a></span>MD_UISwitch_Digital() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -253,12 +267,59 @@ Momentary On Digital Style Switches</div></div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Class Constructor.</p>
+<p>Class Constructor - simple pin.</p>
 <p>Instantiate a new instance of the class. The parameters passed are used to the hardware interface to the switch.</p>
+<p>This form of the constructor is for a simple digital pin (ie, one digital pin).</p>
 <p>The option parameter onState tells the library which level (LOW or HIGH) should be considered the switch 'on' state. If the default LOW state is selected then the library will initialise the pin with INPUT_PULLUP and no external pullup resistors are necessary. If specified HIGH, external pull down resistors will be required.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pin</td><td>the digital pin to which the switch is connected. </td></tr>
+    <tr><td class="paramname">onState</td><td>the state for the switch to be active </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a445ea87a4bbc15694522c6050a21c709"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a445ea87a4bbc15694522c6050a21c709">&#9670;&nbsp;</a></span>MD_UISwitch_Digital() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MD_UISwitch_Digital::MD_UISwitch_Digital </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t *&#160;</td>
+          <td class="paramname"><em>pins</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>pinCount</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>onState</em> = <code><a class="el" href="_m_d___u_i_switch_8h.html#a31b7db8ca6c72f2c2d1f35676ed7bf1c">KEY_ACTIVE_STATE</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Class Constructor - array of pins.</p>
+<p>Instantiate a new instance of the class. The parameters passed are used to the hardware interface to the switch.</p>
+<p>This form of the constructor is for an array of digital pins. The data is not copied from the user code, so the array elements need to remain in scope and constant for the life of the object.</p>
+<p>The option parameter onState tells the library which level (LOW or HIGH) should be considered the switch 'on' state. If the default LOW state is selected then the library will initialise each pin with INPUT_PULLUP and no external pullup resistors are necessary. If specified HIGH, external pull down resistors will be required.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pins</td><td>pointer to array of pin numbers to which the switches are connected. </td></tr>
+    <tr><td class="paramname">pinCount</td><td>the number of pin in the pins[] array </td></tr>
     <tr><td class="paramname">onState</td><td>the state for the switch to be active </td></tr>
   </table>
   </dd>
@@ -357,7 +418,7 @@ Momentary On Digital Style Switches</div></div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="class_m_d___u_i_switch___digital.html">MD_UISwitch_Digital</a></li>
-    <li class="footer">Generated on Sat Nov 11 2017 17:36:39 for MD_UISwitch Library by
+    <li class="footer">Generated on Sat Nov 18 2017 12:09:20 for MD_UISwitch Library by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>
