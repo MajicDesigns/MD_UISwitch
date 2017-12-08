@@ -8,7 +8,7 @@
 #include <MD_UISwitch.h>
 
 // Define what type of testing is being done
-#define TEST_DIGITAL_SIMPLE 0
+#define TEST_DIGITAL_SIMPLE 1
 #define TEST_DIGITAL_ARRAY 0
 
 #define TEST_ANALOG  0
@@ -16,7 +16,7 @@
 #define TEST_MATRIX_4b4  0
 #define TEST_MATRIX_1b4  0
 
-#define TEST_MATRIX_4017KM 1
+#define TEST_MATRIX_4017KM 0
 
 #if TEST_DIGITAL_SIMPLE
 #define TITLE "Simple Digital"

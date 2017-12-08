@@ -49,6 +49,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 \page pageRevisionHistory Revision History
 Revision History
 ----------------
+Dec 2017 version 1.2.0
+- Changed Digital readKey() value to be the pin number not array index
+
 Nov 2017 version 1.1.0
 - Corrected keywords.txt
 - Added array of pins constructor to UISwitch_Digital
@@ -545,7 +548,7 @@ public:
 protected:
   uint8_t     _pin;     ///< pin number
   uiAnalogKeys_t* _kt;  ///< analog key values table
-  uint8_t   _ktSize;    ///< umber of elements in analog keys table
+  uint8_t   _ktSize;    ///< number of elements in analog keys table
 
   int16_t   _lastKeyIdx;  ///< index of the last key read
 };

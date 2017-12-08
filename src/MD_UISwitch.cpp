@@ -223,8 +223,10 @@ MD_UISwitch::keyResult_t MD_UISwitch_Digital::read(void)
     if (idx != _lastKeyIdx) processFSM(false, true); // reset the FSM
 
     b = (idx == _lastKeyIdx);
-    _lastKeyIdx = _lastKey = idx;
+    _lastKeyIdx = idx;
+    _lastKey = _pins[idx];
     UI_PRINT("\nKey idx ", _lastKeyIdx);
+    UI_PRINT(" value ", _lastKey);
   }
 
   return(processFSM(b));
@@ -269,6 +271,7 @@ MD_UISwitch::keyResult_t MD_UISwitch_Analog::read(void)
     _lastKeyIdx = idx;
     _lastKey = _kt[idx].value;
     UI_PRINT("\nKey idx ", _lastKeyIdx);
+    UI_PRINT(" value ", _lastKey);
   }
 
   return(processFSM(b));
@@ -324,8 +327,9 @@ MD_UISwitch::keyResult_t MD_UISwitch_Matrix::read(void)
 
     b = (idx == _lastKeyIdx);
     _lastKeyIdx = idx;
-    _lastKey = _kt[_lastKeyIdx];
+    _lastKey = _kt[idx];
     UI_PRINT("\nKey idx ", _lastKey);
+    UI_PRINT(" value ", _lastKey);
   }
 
   return(processFSM(b));
@@ -394,8 +398,10 @@ MD_UISwitch::keyResult_t MD_UISwitch_4017KM::read(void)
     if (idx != _lastKey) processFSM(false, true); // reset the FSM
 
     b = (idx == _lastKeyIdx);
-    _lastKeyIdx = _lastKey = idx;
+    _lastKeyIdx = idx;
+    _lastKey = idx;
     UI_PRINT("\nKey idx ", _lastKey);
+    UI_PRINT(" value ", _lastKey);
   }
 
   return(processFSM(b));
