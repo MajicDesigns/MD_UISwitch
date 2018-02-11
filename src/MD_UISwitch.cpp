@@ -40,7 +40,7 @@ MD_UISwitch::keyResult_t MD_UISwitch::processFSM(bool b, bool reset)
   if (reset)
   {
     _state = S_IDLE;
-    return;
+    return(k);
   }
 
   switch (_state)

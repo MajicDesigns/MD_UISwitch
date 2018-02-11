@@ -112,7 +112,7 @@ void loop(void)
   switch(k)
   {
     case MD_UISwitch::KEY_NULL:      /* Serial.println("NULL"); */  break;
-    case MD_UISwitch::KEY_PRESS:     Serial.print("\nKEY_SINGLE "); break;
+    case MD_UISwitch::KEY_PRESS:     Serial.print("\nKEY_PRESS "); break;
     case MD_UISwitch::KEY_DPRESS:    Serial.print("\nKEY_DOUBLE "); break;
     case MD_UISwitch::KEY_LONGPRESS: Serial.print("\nKEY_LONG   "); break;
     case MD_UISwitch::KEY_RPTPRESS:  Serial.print("\nKEY_REPEAT "); break;
