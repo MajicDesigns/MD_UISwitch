@@ -285,11 +285,11 @@ void MD_UISwitch_Matrix::begin(void)
 {
   UI_PRINTS("\nUISwitch_Matrix begin()");
 
-  // initialise the hardware
+  // initialize the hardware
   for (uint8_t i = 0; i < _rows; i++) 
     pinMode(_rowPin[i], INPUT_PULLUP);
 
-  // columns initialise during scanning
+  // columns initialize during scanning
   //for (uint8_t i = 0; i < _rows; i++)
   //  pinMode(_colPin[i], OUTPUT);
 
@@ -343,7 +343,7 @@ void MD_UISwitch_4017KM::begin(void)
 {
   UI_PRINTS("\nUISwitch_4017KM begin()");
 
-  // initialise the hardware
+  // initialize the hardware
   digitalWrite(_pinClk, LOW);
   pinMode(_pinClk, OUTPUT);
   pinMode(_pinKey, INPUT);

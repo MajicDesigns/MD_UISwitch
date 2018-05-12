@@ -4,7 +4,7 @@
 
 This library uniformly encapsulates the use of different types of switches 
 for user input devices. The library is easily extended for additional 
-switch types through a class heirarchy and inheritance model, following 
+switch types through a class hierarchy and inheritance model, following 
 the code for existing switch types.
 
 The library includes the following features:
@@ -58,7 +58,7 @@ Nov 2017 version 1.1.0
 - Corrected some switch detection code
 
 Nov 2017 version 1.0.0
-- New library created to consolidate existing MD_KeySwitch and MD_AButton libraryies
+- New library created to consolidate existing MD_KeySwitch and MD_AButton libraries
  */
 
 #include <Arduino.h>
@@ -119,7 +119,7 @@ public:
    * Class Constructor.
    *
    * Instantiate a new instance of the class. 
-   * The main function for the core object is to initialise the internal 
+   * The main function for the core object is to initialize the internal 
    * shared variables and timers to default values.
    *
    */
@@ -140,7 +140,7 @@ public:
   /**
    * Initialize the object.
    *
-   * Initialise the object data. This needs to be called during setup() to initialise new
+   * Initialize the object data. This needs to be called during setup() to initialize new
    * data for the class that cannot be done during the object creation. This method
    * should be replaced in the derived class.
    */
@@ -165,7 +165,7 @@ public:
   * Return the id for the last active switch. This is useful to know which key
   * was actually pressed when there could be more than one key (ie, a key matrix).
   *
-  * \return an identifiying index for the key item, depending on implementation
+  * \return an identifying index for the key item, depending on implementation
   */
   virtual uint8_t getKey(void) { return(_lastKey); };
   /** @} */
@@ -210,7 +210,7 @@ public:
    * first press is detected.
    * The default value is set by the KEY_LONGPRESS_TIME constant.
    *
-   * Note that the relationship betweentimer values should be
+   * Note that the relationship between timer values should be
    * Debounce time < Long Press Time < Repeat time. No checking 
    * is done in the to enforce this relationship.
    *
@@ -253,7 +253,7 @@ public:
    * Enable or disable long press detection. If disabled,
    * the long press notification is skipped when the event 
    * is detected and either a simple press or repeats are 
-   * returned, depening on the setting of the other options.
+   * returned, depending on the setting of the other options.
    * Default is to detect long press events.
    *
    * \param f true to enable, false to disable.
@@ -292,7 +292,7 @@ protected:
   /**
   * FSM state values
   *
-  * States for the internal Finite State Machine to recognised the key press
+  * States for the internal Finite State Machine to recognized the key press
   */
   enum state_t 
   { 
@@ -327,7 +327,7 @@ protected:
   * type of keypress and return one of the keypress types.
   *
   * The timing for each keypress starts when the first transition of the
-  * switch from inactive to active state and is recognised by a finite
+  * switch from inactive to active state and is recognized by a finite
   * state machine invoked in process() whose operation is directed by the
   * timer and option values specified.
   *
@@ -345,13 +345,13 @@ protected:
 /**
 * Extension class MD_UISwitch_Digital.
 *
-* Implements interface for momentary ON switches, such as tact switches or microswitches.
+* Implements interface for momentary ON switches, such as tact switches or micro-switches.
 *
 * ![Momentary On Digital Style Switches] (Digital_Switches.jpg "Digital Switches")
 *
-* Switches can be wired as pull-up or pull-down. Pull-up switches are initialised 
+* Switches can be wired as pull-up or pull-down. Pull-up switches are initialized 
 * with the internal pull-up enabled. Pull-down switches require an external 
-* pull-down resistor circuit. How the switch type is initialised depends on the
+* pull-down resistor circuit. How the switch type is initialized depends on the
 * parameters passed to the class constructor.
 */
 class MD_UISwitch_Digital: public MD_UISwitch
@@ -394,7 +394,7 @@ public:
   *
   * The option parameter onState tells the library which level
   * (LOW or HIGH) should be considered the switch 'on' state. If the
-  * default LOW state is selected then the library will initialise each
+  * default LOW state is selected then the library will initialize each
   * pin with INPUT_PULLUP and no external pullup resistors are necessary.
   * If specified HIGH, external pull down resistors will be required.
   *
@@ -421,7 +421,7 @@ public:
   /**
   * Initialize the object.
   *
-  * Initialise the object data. This needs to be called during setup() to initialise new
+  * Initialise the object data. This needs to be called during setup() to initialize new
   * data for the class that cannot be done during the object creation.
   */
   virtual void begin(void);
@@ -431,7 +431,7 @@ public:
   *
   * Return one of the keypress types depending on what has been detected.
   * The timing for each keypress starts when the first transition of the
-  * switch from inactive to active state and is recognised by a finite
+  * switch from inactive to active state and is recognized by a finite
   * state machine whose operation is directed by the timer and option
   * values specified.
   *
@@ -455,7 +455,7 @@ protected:
 *
 * ![LCD Shield Analog Style Switches] (lcd_shield.jpg "LCD Shield")
 *
-* All the switches are wired to one analog input, genarraly with resistor values 
+* All the switches are wired to one analog input, generally with resistor values 
 * as shown in the circuit below. The switch pressed is determined
 * from the analog value read from the port. This may vary depending on the 
 * implementation of the resistor, so a translation table is implemented to allow
@@ -499,7 +499,7 @@ public:
   * Instantiate a new instance of the class. The parameters passed are
   * used to the hardware interface to the switch.
   *
-  * The key definitions table is not copiued by the class, so user code
+  * The key definitions table is not copied by the class, so user code
   * must ensure that the table remains in scope for the life of the object 
   * created.
   *
@@ -526,7 +526,7 @@ public:
   /**
   * Initialize the object.
   *
-  * Initialise the object data. This needs to be called during setup() to initialise new
+  * Initialise the object data. This needs to be called during setup() to initialize new
   * data for the class that cannot be done during the object creation.
   */
   virtual void begin(void);
@@ -536,7 +536,7 @@ public:
   *
   * Return one of the keypress types depending on what has been detected.
   * The timing for each keypress starts when the first transition of the
-  * switch from inactive to active state and is recognised by a finite
+  * switch from inactive to active state and is recognized by a finite
   * state machine whose operation is directed by the timer and option
   * values specified.
   *
@@ -619,7 +619,7 @@ public:
   /**
   * Initialize the object.
   *
-  * Initialise the object data. This needs to be called during setup() to initialise new
+  * Initialize the object data. This needs to be called during setup() to initialize new
   * data for the class that cannot be done during the object creation.
   */
   virtual void begin(void);
@@ -629,7 +629,7 @@ public:
   *
   * Return one of the keypress types depending on what has been detected.
   * The timing for each keypress starts when the first transition of the
-  * switch from inactive to active state and is recognised by a finite
+  * switch from inactive to active state and is recognized by a finite
   * state machine whose operation is directed by the timer and option
   * values specified.
   *
@@ -705,7 +705,7 @@ public:
   /**
   * Initialize the object.
   *
-  * Initialise the object data. This needs to be called during setup() to initialise new
+  * Initialize the object data. This needs to be called during setup() to initialize new
   * data for the class that cannot be done during the object creation.
   */
   virtual void begin(void);
@@ -715,7 +715,7 @@ public:
   *
   * Return one of the keypress types depending on what has been detected.
   * The timing for each keypress starts when the first transition of the
-  * switch from inactive to active state and is recognised by a finite
+  * switch from inactive to active state and is recognized by a finite
   * state machine whose operation is directed by the timer and option
   * values specified.
   *
