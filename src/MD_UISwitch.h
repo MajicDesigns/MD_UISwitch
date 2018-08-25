@@ -26,10 +26,12 @@ Switch arrangements handled by the library are:
 See Also
 - \subpage pageRevisionHistory
 - \subpage pageCopyright
+- \subpage pageDonation
+
+\page pageDonation Support the Library
+If you like and use this library please consider making a small donation using [PayPal](https://paypal.me/MajicDesigns/4USD)
 
 \page pageCopyright Copyright
-Copyright
----------
 Copyright (C) 2017 Marco Colli. All rights reserved.
 
 This library is free software; you can redistribute it and/or
@@ -47,8 +49,6 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 \page pageRevisionHistory Revision History
-Revision History
-----------------
 Dec 2017 version 1.2.0
 - Changed Digital readKey() value to be the pin number not array index
 
