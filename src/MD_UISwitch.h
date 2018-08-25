@@ -315,7 +315,7 @@ protected:
   uint16_t  _timeDebounce;  ///< debounce time in milliseconds
   uint16_t  _timeDoublePress; ///< double press detection time in milliseconds
   uint16_t  _timeLongPress; ///< long press time in milliseconds
-  int16_t   _timeRepeat;    ///< repeat time delay in milliseconds
+  uint16_t  _timeRepeat;    ///< repeat time delay in milliseconds
   
   uint8_t   _lastKey;       ///< persists the last key value until a new one is detected
   int16_t   _lastKeyIdx;    ///< internal index of the last key read
@@ -727,8 +727,8 @@ public:
 protected:
   uint8_t  _numKeys; ///< total number of keys
   uint8_t  _pinClk;  ///< 4017 clock pin, LOW to HIGH transition
-  uint8_t  _pinRst;  ///< 4017 reset pin (0 if not used), LOW to HIGH transition
   uint8_t  _pinKey;  ///< key switch output to Arduino, HIGH means key is pressed	
+  uint8_t  _pinRst;  ///< 4017 reset pin (0 if not used), LOW to HIGH transition
 
   void reset(void);  ///< reset the 4017 IC
   void clock(void);  ///< clock the 4017 IC
