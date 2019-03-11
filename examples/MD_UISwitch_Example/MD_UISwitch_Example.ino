@@ -14,14 +14,15 @@
 #define TEST_ANALOG  0
 
 #define TEST_MATRIX_4b4  0
-#define TEST_MATRIX_1b4  0
+#define TEST_MATRIX_1b6  0
 
 #define TEST_MATRIX_4017KM 0
+
 
 #if TEST_DIGITAL_SIMPLE
 #define TITLE "Simple Digital"
 
-const uint8_t DIGITAL_SWITCH_PIN = 6;       // switch connected to this pin
+const uint8_t DIGITAL_SWITCH_PIN = 4;       // switch connected to this pin
 const uint8_t DIGITAL_SWITCH_ACTIVE = LOW;  // digital signal when switch is pressed 'on'
 
 MD_UISwitch_Digital S(DIGITAL_SWITCH_PIN, DIGITAL_SWITCH_ACTIVE);
@@ -36,7 +37,7 @@ MD_UISwitch_Digital S(DIGITAL_SWITCH_PINS, ARRAY_SIZE(DIGITAL_SWITCH_PINS), DIGI
 #endif
 
 #if TEST_ANALOG
-#define TITLE "Analaog Input"
+#define TITLE "Analog Input"
 
 const uint8_t ANALOG_SWITCH_PIN = A0;       // switches connected to this pin
 
@@ -67,8 +68,8 @@ char kt[(ROWS*COLS) + 1] = "123A456B789C*0#D";  //define the symbols for the key
 MD_UISwitch_Matrix S(ROWS, COLS, rowPins, colPins, kt);
 #endif
 
-#if TEST_MATRIX_1b4
-#define TITLE "Matrix 1x4"
+#if TEST_MATRIX_1b6
+#define TITLE "Matrix 1x6"
 
 uint8_t rowPins[] = { 11 };     // connected to keypad row pinouts
 uint8_t colPins[] = { 10, 9, 8, 7, 6, 5 };   // connected to the keypad column pinouts
@@ -111,8 +112,10 @@ void loop(void)
 
   switch(k)
   {
-    case MD_UISwitch::KEY_NULL:      /* Serial.println("NULL"); */  break;
-    case MD_UISwitch::KEY_PRESS:     Serial.print("\nKEY_PRESS "); break;
+    case MD_UISwitch::KEY_NULL:      /* Serial.print("KEY_NULL"); */  break;
+    case MD_UISwitch::KEY_UP:        Serial.print("\nKEY_UP ");     break;
+    case MD_UISwitch::KEY_DOWN:      Serial.print("\n\nKEY_DOWN ");   break;
+    case MD_UISwitch::KEY_PRESS:     Serial.print("\nKEY_PRESS ");  break;
     case MD_UISwitch::KEY_DPRESS:    Serial.print("\nKEY_DOUBLE "); break;
     case MD_UISwitch::KEY_LONGPRESS: Serial.print("\nKEY_LONG   "); break;
     case MD_UISwitch::KEY_RPTPRESS:  Serial.print("\nKEY_REPEAT "); break;

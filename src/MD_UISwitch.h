@@ -49,6 +49,12 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 \page pageRevisionHistory Revision History
+Mar 2019 version 2.0.0
+- Added separate debounce rountine
+- Added Key-UP and KEY_DOWN indicators
+- Replaced setDebounceTime() with setPressTime()
+- Simplified FSM to eliminate FSM debounce code
+
 Dec 2017 version 1.2.0
 - Changed Digital readKey() value to be the pin number not array index
 
@@ -70,11 +76,11 @@ Nov 2017 version 1.0.0
 
 // Default values for timed events.
 // Note these are all from the same base (ie when the switch is first detected)
-const uint16_t KEY_DEBOUNCE_TIME = 50;    ///< Default key debounce time in milliseconds
+const uint16_t KEY_PRESS_TIME = 150;      ///< Default key press time in milliseconds
 const uint16_t KEY_DPRESS_TIME = 250;     ///< Default double press time between presses in milliseconds
 const uint16_t KEY_LONGPRESS_TIME = 600;  ///< Default long press detection time in milliseconds
 const uint16_t KEY_REPEAT_TIME = 300;     ///< Default time between repeats in in milliseconds
-const uint8_t KEY_ACTIVE_STATE = LOW;     ///< Default key is active low - transition high to low detection
+const uint8_t  KEY_ACTIVE_STATE = LOW;    ///< Default key is active low - transition high to low detection
 
 // Bit enable/disable
 const uint8_t REPEAT_RESULT_ENABLE = 3; ///< Internal status bit to return KS_REPEAT instead of KS_PRESS
@@ -104,6 +110,8 @@ public:
   enum keyResult_t
   {
     KEY_NULL,        ///< No key press
+    KEY_DOWN,        ///< Switch is detected as active (down)
+    KEY_UP,          ///< Switch is detected as inactive (up)
     KEY_PRESS,       ///< Simple press, or a repeated press sequence if enableRepeatResult(false) (default)
     KEY_DPRESS,      ///< Double press
     KEY_LONGPRESS,   ///< Long press
@@ -142,22 +150,22 @@ public:
    *
    * Initialize the object data. This needs to be called during setup() to initialize new
    * data for the class that cannot be done during the object creation. This method
-   * should be replaced in the derived class.
+   * must be replaced in the derived class.
    */
-  virtual void begin(void) {};
+  virtual void begin(void) = 0;
   
   /**
   * Read input and return the state of the switch
   *
   * Read the input key switch and invoke the process method to determine
-  * what the keystroke means. This method needs to be replaced in the derived class
+  * what the keystroke means. This method must be replaced in the derived class
   * with a hardware specific method to read the key switch.
   *
   * \sa processFSM() method
   *
   * \return the keyResult_t enumerated value from processFSM()
   */
-  virtual keyResult_t read(void) { return(KEY_NULL); };
+  virtual keyResult_t read(void) = 0;
 
   /**
   * Read the key identifier for the last switch
@@ -175,19 +183,18 @@ public:
   * @{
   */
   /**
-   * Set the debounce time
-   *
-   * Set the switch debounce time in milliseconds.
-   * The default value is set by the KEY_DEBOUNCE_TIME constant.
-   *
-   * Note that the relationship between timer values should be
-   * Debounce time < Long Press Time < Repeat time. No checking 
-   * is done in the to enforce this relationship.
-   *
-   * \param t the specified time in milliseconds.
-   */
-  inline void setDebounceTime(uint16_t t) 
-    { _timeDebounce = t; };
+  * Set the press time
+  *
+  * Set the switch press time in milliseconds.
+  * The default value is set by the KEY_PRESS_TIME constant.
+  *
+  * Note that the relationship between timer values should be
+  * Press Time < Long Press Time < Repeat time. No checking
+  * is done in the to enforce this relationship.
+  *
+  * \param t the specified time in milliseconds.
+  */
+  inline void setPressTime(uint16_t t) { _timePress = t; };
 
   /**
    * Set the double press detection time
@@ -199,8 +206,7 @@ public:
    *
    * \param t the specified time in milliseconds.
    */
-  inline void setDoublePressTime(uint16_t t)
-    { _timeDoublePress = t; enableDoublePress(true); };
+  inline void setDoublePressTime(uint16_t t) { _timeDoublePress = t; enableDoublePress(true); };
 
   /**
    * Set the long press detection time
@@ -211,13 +217,12 @@ public:
    * The default value is set by the KEY_LONGPRESS_TIME constant.
    *
    * Note that the relationship between timer values should be
-   * Debounce time < Long Press Time < Repeat time. No checking 
+   * Press Time < Long Press Time < Repeat time. No checking 
    * is done in the to enforce this relationship.
    *
    * \param t the specified time in milliseconds.
    */
-  inline void setLongPressTime(uint16_t t)
-    { _timeLongPress = t; enableLongPress(true); };
+  inline void setLongPressTime(uint16_t t) { _timeLongPress = t; enableLongPress(true); };
 
   /**
    * Set the repeat time
@@ -227,13 +232,12 @@ public:
    * from when the first press is detected.
    *
    * Note that the relationship between timer values should be
-   * Debounce time < Long Press Time < Repeat time. No checking 
+   * Press Time < Long Press Time < Repeat time. No checking 
    * is done in the to enforce this relationship.
    *
    * \param t the specified time in milliseconds.
    */
-  inline void setRepeatTime(uint16_t t)
-    { _timeRepeat = t; enableRepeat(true); };
+  inline void setRepeatTime(uint16_t t) { _timeRepeat = t; enableRepeat(true); };
 
   /**
    * Enable double press detection
@@ -244,8 +248,7 @@ public:
    *
    * \param f true to enable, false to disable.
    */
-  inline void enableDoublePress(boolean f)
-    { if (f) bitSet(_enableFlags, DPRESS_ENABLE); else bitClear(_enableFlags, DPRESS_ENABLE); };
+  inline void enableDoublePress(boolean f) { (f) ? bitSet(_enableFlags, DPRESS_ENABLE) : bitClear(_enableFlags, DPRESS_ENABLE); };
 
   /**
    * Enable long press detection
@@ -258,8 +261,7 @@ public:
    *
    * \param f true to enable, false to disable.
    */
-  inline void enableLongPress(boolean f)
-    { if (f) bitSet(_enableFlags, LONGPRESS_ENABLE); else bitClear(_enableFlags, LONGPRESS_ENABLE); };
+  inline void enableLongPress(boolean f) { (f) ? bitSet(_enableFlags, LONGPRESS_ENABLE) : bitClear(_enableFlags, LONGPRESS_ENABLE); };
 
   /**
    * Enable repeat detection
@@ -271,8 +273,7 @@ public:
    *
    * \param f true to enable, false to disable.
    */
-  inline void enableRepeat(boolean f)
-    { if (f) bitSet(_enableFlags, REPEAT_ENABLE); else bitClear(_enableFlags, REPEAT_ENABLE); };
+  inline void enableRepeat(boolean f) { (f) ? bitSet(_enableFlags, REPEAT_ENABLE) : bitClear(_enableFlags, REPEAT_ENABLE); };
 
   /**
    * Modify repeat notification
@@ -284,8 +285,7 @@ public:
    *
    * \param f true to enable, false to disable (default).
    */
-  inline void enableRepeatResult(boolean f)
-    { if (f) bitSet(_enableFlags, REPEAT_RESULT_ENABLE); else bitClear(_enableFlags, REPEAT_RESULT_ENABLE); };
+  inline void enableRepeatResult(boolean f) { (f) ? bitSet(_enableFlags, REPEAT_RESULT_ENABLE) : bitClear(_enableFlags, REPEAT_RESULT_ENABLE); };
   /** @} */
 
 protected:
@@ -297,11 +297,10 @@ protected:
   enum state_t 
   { 
     S_IDLE,       ///< Idle state - waiting for key transition
-    S_DEBOUNCE1,  ///< First press debounce 
-    S_DEBOUNCE2,  ///< Second (double) press debounce
     S_PRESS,      ///< Detecting possible simple press
-    S_DPRESS,     ///< Detecting possible double press
-    S_LPRESS,     ///< Detecting possible long press
+    S_PRESS2A,    ///< Detecting possible double press part A
+    S_PRESS2B,    ///< Detecting possible double press part B
+    S_PRESSL,     ///< Detecting possible long press
     S_REPEAT,     ///< Outputting repeat keys when timer expires
     S_WAIT        ///< Waiting for key to be released after long press is detected
   };
@@ -310,9 +309,9 @@ protected:
   uint32_t  _timeActive;  ///< the millis() time it was last activated
   uint8_t   _enableFlags; ///< functions enabled/disabled
 
-  // Note that Debounce time < Long Press Time < Repeat time. No checking is done in the
+  // Note that Press time < Long Press Time < Repeat time. No checking is done in the
   // library to enforce this relationship.
-  uint16_t  _timeDebounce;  ///< debounce time in milliseconds
+  uint16_t  _timePress;     ///< press time in milliseconds
   uint16_t  _timeDoublePress; ///< double press detection time in milliseconds
   uint16_t  _timeLongPress; ///< long press time in milliseconds
   uint16_t  _timeRepeat;    ///< repeat time delay in milliseconds
@@ -335,11 +334,24 @@ protected:
   * and no other processing is performed (ie, the bState parameter is
   * ignored).
   *
-  * \param bState true if the switch is active, false otherwise.
+  * \param swState true if the switch is active, false otherwise.
   * \param reset  an optional identifier to reset the FSM.
   * \return one of the keyResult_t enumerated values.
   */
-  keyResult_t processFSM(bool bState, bool reset = 0);
+  keyResult_t processFSM(bool swState, bool reset = false);
+
+  /**
+  * Switch debounce using Edge Detection & Resistor-Capacitor Digital Filter.
+  *
+  * A digital filter that mimics an analogue RC filter with first-order
+  * recursive low pass filter. It has good EMI filtering and quick response,
+  * with a nearly continuous output like an analogue circuit.
+  *
+  * \param curStatus  current active status for the switch.
+  * \param reset  an optional identifier to reset the debounce detection.
+  * \return true if the switch is 'debounced' active, false otherwise.
+  */
+  bool debounce(bool curStatus, bool reset = false);
 };
 
 /**

@@ -25,156 +25,278 @@ const int16_t KEY_IDX_UNDEF = -1;   ///< Index value for undefined index
 
 MD_UISwitch::MD_UISwitch(void) : _state(S_IDLE), _lastKeyIdx(KEY_IDX_UNDEF)
 {
-  setDebounceTime(KEY_DEBOUNCE_TIME);
+  setPressTime(KEY_PRESS_TIME);
   setDoublePressTime(KEY_DPRESS_TIME);
   setLongPressTime(KEY_LONGPRESS_TIME);
   setRepeatTime(KEY_REPEAT_TIME);
   enableRepeatResult(false);
 }
 
-MD_UISwitch::keyResult_t MD_UISwitch::processFSM(bool b, bool reset)
-// return one of the keypress types depending on what has been detected
+bool MD_UISwitch::debounce(bool curStatus, bool reset)
+/*
+  Switch debounce using Edge Detection & Resistor-Capacitor Digital Filter.
+
+  This Digital filter mimics an analogue RC filter with first-order
+  recursive low pass filter. It has good EMI filtering and quick response,
+  with a nearly continuous output like an analogue circuit.
+
+  Based on Elio Mazzocca, Contact-debouncing algorithm emulates Schmitt trigger.
+  Based on Oregon State University, Debounce switches algorithm.
+  Based on John Youngquist, Debouncing Switches and Encoders.
+  Version by Andrew M. Kollosche, 2015-2018 at http://www.ganssle.com/tem/tem366.html
+
+  Time-Constant  TCSHIFT, TC,  UTH,  LTH, Approx execute times on a PIC16 @ 2MHz.
+  Quarter           2,    63,  242,   15,  1ms.
+  Eight             3,    31,  238,   12,  2ms.
+  Sixteenth         4,    15,  230,   10,  3ms.
+  Thirty-second     5,     7,  215,    7,  9ms.
+  Sixty-forth       6,     3,  184,    3,  15ms.
+
+  Note: Thresholds count for each RC time-constant,
+  is calculated on 3 time-constants or for Upper threshold is 96% and
+  3% for Lower Threshold.
+*/
 {
+  // --- These constants are a consistent set from the table above
+  const uint8_t TC_SHIFT = 5;   // bit shift for fraction
+  const uint8_t TC = 7;         // RC time constant
+  const uint8_t UTH = 215;      // Upper Threshold  for 'on'
+  const uint8_t LTH = 7;        // Lower Threshold for 'off'
+  // ---
+  static uint8_t RC = 0;           // RC integrator value
+  static bool prevStatus = false;  // previous 'active' status for edge detection
+
+  static enum { IDLE, DEBOUNCE, WAIT_RELEASE } state = IDLE;
+
+  // handle the reset
+  if (reset)
+  {
+    RC = 0;
+    prevStatus = false;
+    state = IDLE;
+  }
+
+  bool b = prevStatus; // return status value
+
+  //edge detector from 'inactive' to 'active'
+  switch (state)
+  {
+    case IDLE:      // wait for 'inactive' to 'active' transition
+    {
+      if (!prevStatus && curStatus)
+        state = DEBOUNCE;
+      prevStatus = curStatus;
+    }
+    break;
+
+    case DEBOUNCE:  // RC debounce
+    {
+      //first compute RCnew = RCold * fraction. Using shift and subtraction.
+      uint8_t temp = RC >> TC_SHIFT;
+      RC = RC - temp;   // subtract fraction for result.
+
+      if (curStatus)    // still an active switch
+        RC += TC;       // add in the time constant
+      else
+        if (RC > 0) RC--; // 'leak' and decay the value
+
+      //check upper & lower threshold.
+      b = (RC > UTH);     // upper threshold means we have a valid result
+      if (b or RC < LTH)  // got result or lower threshold
+      {
+        RC = 0;               // reset RC value
+        state = WAIT_RELEASE; // move on to next state
+      }
+    }
+    break;
+
+    case WAIT_RELEASE:  // waiting for switch release
+    default:
+    {
+      if (!curStatus) state = IDLE;
+    }
+    break;
+  }
+
+  // UIPRINTS((b) ? "-> DOWN" : "<- UP");
+
+  return (b);
+}
+
+MD_UISwitch::keyResult_t MD_UISwitch::processFSM(bool b, bool reset)
+// Return one of the keypress types depending on what has been detected
+// in the FSM logic
+{
+  static keyResult_t kPush = KEY_NULL;
   keyResult_t k = KEY_NULL;
 
   if (reset)
   {
     _state = S_IDLE;
+    kPush = KEY_NULL;
     return(k);
   }
 
+  // If we have previously pushed something return that status now
+  if (kPush != KEY_NULL)
+  {
+    k = kPush;
+    kPush = KEY_NULL;
+    return(k);
+  }
+
+  // Now run the FSM with the input
   switch (_state)
   {
-    case S_IDLE:    // waiting for first transition
-      //UI_PRINTS("\nS_IDLE");
-      if (b)
+  case S_IDLE:    // waiting for first transition
+    //UI_PRINT("\nS_IDLE", b);
+    if (b)
+    {
+      _state = S_PRESS;
+      _timeActive = millis();
+      k = KEY_DOWN;
+    }
+    break;
+
+  case S_PRESS:   // press?
+    UI_PRINT("\nS_PRESS ", b);
+    // Key off before a long press registered, so it is either double press or a press.
+    if (!b)
+    {
+      k = KEY_UP;
+      if (bitRead(_enableFlags, DPRESS_ENABLE))  // DPRESS allowed
       {
-        _state = S_DEBOUNCE1;   // edge detected, initiate debounce
+        _state = S_PRESS2A;
         _timeActive = millis();
       }
-      break;
-
-    case S_DEBOUNCE1:
-      UI_PRINTS("\nS_DEBOUNCE1");
-      // Wait for debounce time to run out and ignore any key switching
-      // that might be going on as this may be bounce
-      if ((millis() - _timeActive) < _timeDebounce)
-        break;
-
-      // after debounce - possible long or double press so move to next state
-      _state = S_PRESS;
-      // fall through
-
-    case S_PRESS:   // press?
-      UI_PRINTS("\nS_PRESS");
-      // Key off before a long press registered, so it is either double press or a press.
-      if (!b)
+      else      // this is just a press
       {
-        if (bitRead(_enableFlags, DPRESS_ENABLE))  // DPRESS allowed
-          _state = S_DPRESS;
-        else      // this is just a press
-        {
-          k = KEY_PRESS;
-          _state = S_IDLE;
-        }
-      }
-      else  // if (b)
-      {
-        // if the switch is still on and we have not run out of longpress time, then
-        // just wait for the timer to expire
-        if (millis() - _timeActive < _timeLongPress)
-          break;
-
-        // time has run out, we either have a long press or are heading
-        // towards repeats if they are enabled
-        if (bitRead(_enableFlags, LONGPRESS_ENABLE) || bitRead(_enableFlags, REPEAT_ENABLE))
-        {
-          _timeActive = millis();   // reset for repeat timer base
-          _state = S_LPRESS;
-        }
-        else    // no other option as we have detected something!
-        {
-          k = KEY_PRESS;
-          _state = S_WAIT;
-        }
-      }
-      break;
-
-    case S_LPRESS:  // long press or auto repeat?
-      UI_PRINTS("\nS_LPRESS");
-      // It is a long press if
-      // - Key off before a repeat press is registered, or
-      // - Auto repeat is disabled
-      // Set the return code and go back to waiting
-      if (!b || !bitRead(_enableFlags, REPEAT_ENABLE))
-      {
-        k = bitRead(_enableFlags, LONGPRESS_ENABLE) ? KEY_LONGPRESS : KEY_PRESS;
-        _state = S_WAIT;
-        break;
-      }
-      // fall through but remain in this state
-
-    case S_REPEAT: // repeat?
-      // Key off before another repeat press is registered, so we have finished.
-      // Go back to waiting
-      if (!b)
-      {
-        if (_state == S_LPRESS) // did not make the first repeat
-          k = bitRead(_enableFlags, LONGPRESS_ENABLE) ? KEY_LONGPRESS : KEY_PRESS;
+        kPush = KEY_PRESS;
         _state = S_IDLE;
       }
-      else    // if (b)
-      {
-        // if the switch is still on and we have not run out of repeat time, then
-        // just wait for the timer to expire.
-        if ((millis() - _timeActive) < _timeRepeat)
-          break;
+    }
 
-        // we are now sure we have a repeat, set the return code and remain in this
-        // state checking for further repeats if enabled
-        k = (bitRead(_enableFlags, REPEAT_RESULT_ENABLE) && _state == S_REPEAT) ? KEY_RPTPRESS : KEY_PRESS;
-        _state = bitRead(_enableFlags, REPEAT_ENABLE) ? S_REPEAT : S_WAIT;
-        _timeActive = millis();	// next key repeat time starts now
+    // if the switch is still on and we have run out of press time ...
+    if (millis() - _timeActive > _timePress)
+    {
+      _timeActive = millis();   // reset for repeat timer base
+      // ... we either have a long press or are 
+      // heading towards repeats if they are enabled
+      if (bitRead(_enableFlags, LONGPRESS_ENABLE)) 
+        _state = S_PRESSL;
+      else if (bitRead(_enableFlags, REPEAT_ENABLE))
+      {
+        k = KEY_PRESS;
+        _state = S_REPEAT;
       }
+      else // nothing else that can be done as we have no time left!
+      {
+        k = KEY_PRESS;
+        _state = S_WAIT;
+      }
+    }
+    break;
+
+  case S_PRESSL:  // long press or auto repeat?
+    UI_PRINT("\nS_PRESSL ", b);
+    // It is a long press if
+    // - Key off before a repeat press is registered, or
+    // - Auto repeat is disabled
+    // Set the return code and go back to waiting
+    if (!b)
+    {
+      kPush = KEY_LONGPRESS;
+      k = KEY_UP;
+      _state = S_IDLE;
       break;
+    }
 
-    case S_DPRESS:
-      UI_PRINTS("\nS_DPRESS");
-      if (!b)
+    if (millis() - _timeActive > _timeLongPress)
+    {
+      if (bitRead(_enableFlags, REPEAT_ENABLE))
       {
-        // we didn't get a second press within time then this was just a press
-        if (millis() - _timeActive >= _timeDoublePress)
-        {
-          k = KEY_PRESS;
-          _state = S_IDLE;
-        }
+        k = KEY_PRESS;      // the first of the repeats
+        _state = S_REPEAT;  // handle the rest of them
+        _timeActive = millis();  // set the new baseline time.
       }
-      else  // if (b)
+      else  // no repeats - register the long press and wait for release
       {
-        _state = S_DEBOUNCE2;		// edge detected, initiate debounce
-        _timeActive = millis();
+        k = KEY_LONGPRESS;
+        _state = S_WAIT;
       }
-      break;
+    }
+    break;
 
-    case S_DEBOUNCE2:
-      UI_PRINTS("\nS_DEBOUNCE2");
-      // Wait for debounce time to run out and ignore any key switching
-      // that might be going on as this may be bounce
-      if ((millis() - _timeActive) < _timeDebounce)
+  case S_REPEAT: // repeat?
+    UI_PRINT("\nS_REPEAT ", b);
+    // Key off before another repeat press is registered, so we have finished.
+    // Go back to waiting
+    if (!b)
+    {
+      k = KEY_UP;
+      _state = S_IDLE;
+    }
+    else    // if (b)
+    {
+      // if the switch is still on and we have not run out of repeat time, then
+      // just wait for the timer to expire.
+      if ((millis() - _timeActive) < _timeRepeat)
         break;
 
-      k = b ? KEY_DPRESS : KEY_PRESS;
-      _timeActive = millis();
-      _state = S_WAIT;
-      break;
+      // we are now sure we have a repeat, set the return code and remain in this
+      // state checking for further repeats if enabled
+      k = bitRead(_enableFlags, REPEAT_RESULT_ENABLE) ? KEY_RPTPRESS : KEY_PRESS;
+      _timeActive = millis();	// next key repeat time starts now
+    }
+    break;
 
-    case S_WAIT:
-    default:
-      // After completing while still key active, allow the user to release the switch
-      // to meet starting conditions for S_IDLE
-      UI_PRINTS("\nS_WAITING");
-      if (!b)  _state = S_IDLE;
-      break;
+  case S_PRESS2A:   // Wait for key to be pressed again in double press sequence
+    UI_PRINT("\nS_PRESS2A ", b);
+    if (b)
+    {
+      k = KEY_DOWN;
+      _state = S_PRESS2B;		// switch detected, initiate second
+      _timeActive = millis();
+    }
+
+    // Check if we didn't get a second press within time - 
+    // then this was just a press and wait for key release
+    if (millis() - _timeActive  > _timeDoublePress)
+    {
+      k = KEY_PRESS;
+      _state = (b) ? S_WAIT : S_IDLE;
+    }
+    break;
+
+  case S_PRESS2B:   // Wait for key to be released in double press sequence
+    UI_PRINT("\nS_PRESS2B ", b);
+    if (!b)
+    {
+      k = KEY_UP;
+      kPush = KEY_DPRESS;
+      _state = S_IDLE;
+    }
+
+    // we didn't get a second release within time then this was just a press
+    // and we wait for the key to be released
+    if (millis() - _timeActive >= _timePress*2)
+    {
+      kPush = KEY_PRESS;
+      _state = (b) ? S_WAIT : S_IDLE;
+    }
+    break;
+
+  case S_WAIT:
+  default:
+    // After completing while still key active, allow the user to release the switch
+    // to meet starting conditions for S_IDLE
+    UI_PRINT("\nS_WAITING ", b);
+    if (!b)
+    {
+      k = KEY_UP;
+      _state = S_IDLE;
+    }
+    break;
   }
 
   return(k);
@@ -196,8 +318,6 @@ void MD_UISwitch_Digital::begin(void)
     else
       pinMode(_pins[i], INPUT);
   }
-
-  MD_UISwitch::begin();
 }
 
 MD_UISwitch::keyResult_t MD_UISwitch_Digital::read(void)
@@ -211,7 +331,7 @@ MD_UISwitch::keyResult_t MD_UISwitch_Digital::read(void)
   {
     if (digitalRead(_pins[i]) == _onState)
     {
-      if (idx == KEY_IDX_UNDEF) idx = i;
+      if (idx == KEY_IDX_UNDEF) idx = i;  // only record the first one
       count++;
     }
   }
@@ -220,16 +340,16 @@ MD_UISwitch::keyResult_t MD_UISwitch_Digital::read(void)
   if (count == 1)   // we have a valid key
   {
     // is this the same as the previous key?
-    if (idx != _lastKeyIdx) processFSM(false, true); // reset the FSM
+    if (idx != _lastKeyIdx) processFSM(debounce(false, true), true); // reset the debounce and FSM
 
     b = (idx == _lastKeyIdx);
     _lastKeyIdx = idx;
     _lastKey = _pins[idx];
-    UI_PRINT("\nKey idx ", _lastKeyIdx);
-    UI_PRINT(" value ", _lastKey);
+    //UI_PRINT("\nKey idx ", _lastKeyIdx);
+    //UI_PRINT(" value ", _lastKey);
   }
 
-  return(processFSM(b));
+  return(processFSM(debounce(b)));
 }
 // -----------------------------------------------
 
@@ -240,8 +360,6 @@ void MD_UISwitch_Analog::begin(void)
 {
   UI_PRINTS("\nUISwitch_Analog begin()");
   pinMode(_pin, INPUT);
-
-  MD_UISwitch::begin();
 }
 
 MD_UISwitch::keyResult_t MD_UISwitch_Analog::read(void)
@@ -265,7 +383,7 @@ MD_UISwitch::keyResult_t MD_UISwitch_Analog::read(void)
   if (idx != KEY_IDX_UNDEF)
   {
     // is this the same as the previous key?
-    if (idx != _lastKeyIdx) processFSM(false, true); // reset the FSM
+    if (idx != _lastKeyIdx) processFSM(debounce(false, true), true); // reset the FSM
 
     b = (idx == _lastKeyIdx);
     _lastKeyIdx = idx;
@@ -274,7 +392,7 @@ MD_UISwitch::keyResult_t MD_UISwitch_Analog::read(void)
     UI_PRINT(" value ", _lastKey);
   }
 
-  return(processFSM(b));
+  return(processFSM(debounce(b)));
 }
 // -----------------------------------------------
 
@@ -292,8 +410,6 @@ void MD_UISwitch_Matrix::begin(void)
   // columns initialize during scanning
   //for (uint8_t i = 0; i < _rows; i++)
   //  pinMode(_colPin[i], OUTPUT);
-
-  MD_UISwitch::begin();
 }
 
 MD_UISwitch::keyResult_t MD_UISwitch_Matrix::read(void)
@@ -323,7 +439,7 @@ MD_UISwitch::keyResult_t MD_UISwitch_Matrix::read(void)
   if (count == 1)  // we have a valid key
   {
     // is this the same as the previous key?
-    if (idx != _lastKeyIdx) processFSM(false, true); // reset the FSM
+    if (idx != _lastKeyIdx) processFSM(debounce(false, true), true); // reset the FSM
 
     b = (idx == _lastKeyIdx);
     _lastKeyIdx = idx;
@@ -332,7 +448,7 @@ MD_UISwitch::keyResult_t MD_UISwitch_Matrix::read(void)
     UI_PRINT(" value ", _lastKey);
   }
 
-  return(processFSM(b));
+  return(processFSM(debounce(b)));
 }
 // -----------------------------------------------
 
@@ -352,8 +468,6 @@ void MD_UISwitch_4017KM::begin(void)
     pinMode(_pinRst, OUTPUT);
     digitalWrite(_pinRst, LOW);
   }
-
-  MD_UISwitch::begin();
 }
 
 void MD_UISwitch_4017KM::reset(void)
@@ -371,7 +485,6 @@ void MD_UISwitch_4017KM::clock(void)
 }
 
 MD_UISwitch::keyResult_t MD_UISwitch_4017KM::read(void)
-
 {
   bool b = false;
   int16_t idx = KEY_IDX_UNDEF;
@@ -395,7 +508,7 @@ MD_UISwitch::keyResult_t MD_UISwitch_4017KM::read(void)
   if (count == 1)  // we have a valid key
   {
     // is this the same as the previous key?
-    if (idx != _lastKey) processFSM(false, true); // reset the FSM
+    if (idx != _lastKey) processFSM(debounce(false, true), true); // reset the FSM
 
     b = (idx == _lastKeyIdx);
     _lastKeyIdx = idx;
@@ -404,6 +517,6 @@ MD_UISwitch::keyResult_t MD_UISwitch_4017KM::read(void)
     UI_PRINT(" value ", _lastKey);
   }
 
-  return(processFSM(b));
+  return(processFSM(debounce(b)));
 }
 // -----------------------------------------------
