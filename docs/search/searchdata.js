@@ -3,12 +3,12 @@ var indexSectionsWithContent =
   0: "_abcdegklmprsuv~",
   1: "mu",
   2: "m",
-  3: "bcegmprs~",
+  3: "bcdegmprs~",
   4: "_adklrv",
   5: "ks",
   6: "ks",
   7: "u",
-  8: "cmr"
+  8: "cmrs"
 };
 
 var indexSectionNames =

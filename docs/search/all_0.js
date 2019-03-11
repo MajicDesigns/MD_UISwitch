@@ -20,8 +20,8 @@ var searchData=
   ['_5frows',['_rows',['../class_m_d___u_i_switch___matrix.html#a109063b81833d187c15fad6f657a82d7',1,'MD_UISwitch_Matrix']]],
   ['_5fstate',['_state',['../class_m_d___u_i_switch.html#a637d10dfdd1ce03d0d99793024d9d13a',1,'MD_UISwitch']]],
   ['_5ftimeactive',['_timeActive',['../class_m_d___u_i_switch.html#af8088c6ba1b4c581e0f04951a1017663',1,'MD_UISwitch']]],
-  ['_5ftimedebounce',['_timeDebounce',['../class_m_d___u_i_switch.html#ae666b71094edccf25a39f53ecc311f6e',1,'MD_UISwitch']]],
   ['_5ftimedoublepress',['_timeDoublePress',['../class_m_d___u_i_switch.html#a4dc9cf90297ab2a8af69c5a032aa872c',1,'MD_UISwitch']]],
   ['_5ftimelongpress',['_timeLongPress',['../class_m_d___u_i_switch.html#a1458feab310d6192e2b397d0015cfd8f',1,'MD_UISwitch']]],
-  ['_5ftimerepeat',['_timeRepeat',['../class_m_d___u_i_switch.html#acbaa5fe4ca9e6826f254e31af86a91b1',1,'MD_UISwitch']]]
+  ['_5ftimepress',['_timePress',['../class_m_d___u_i_switch.html#a53465ead17577f79bf946ea1be47f654',1,'MD_UISwitch']]],
+  ['_5ftimerepeat',['_timeRepeat',['../class_m_d___u_i_switch.html#a4513d97e2bee782f75d72252250e1d6b',1,'MD_UISwitch']]]
 ];

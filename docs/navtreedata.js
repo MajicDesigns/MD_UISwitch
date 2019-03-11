@@ -26,6 +26,7 @@ var NAVTREE =
   [ "MD_UISwitch Library", "index.html", [
     [ "Revision History", "page_revision_history.html", null ],
     [ "Copyright", "page_copyright.html", null ],
+    [ "Support the Library", "page_donation.html", null ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],

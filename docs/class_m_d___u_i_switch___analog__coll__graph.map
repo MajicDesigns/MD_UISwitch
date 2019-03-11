@@ -1,4 +1,5 @@
 <map id="MD_UISwitch_Analog" name="MD_UISwitch_Analog">
-<area shape="rect" id="node2" href="$class_m_d___u_i_switch.html" title="MD_UISwitch" alt="" coords="5,13,104,40"/>
-<area shape="rect" id="node4" href="$struct_m_d___u_i_switch___analog_1_1ui_analog_keys__t.html" title="MD_UISwitch_Analog\l::uiAnalogKeys_t" alt="" coords="129,6,276,47"/>
+<area shape="rect" id="node1" title=" " alt="" coords="55,112,201,139"/>
+<area shape="rect" id="node2" href="$class_m_d___u_i_switch.html" title=" " alt="" coords="5,13,104,40"/>
+<area shape="rect" id="node4" href="$struct_m_d___u_i_switch___analog_1_1ui_analog_keys__t.html" title=" " alt="" coords="129,6,276,47"/>
 </map>
