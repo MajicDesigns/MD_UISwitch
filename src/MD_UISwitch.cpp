@@ -30,6 +30,8 @@ MD_UISwitch::MD_UISwitch(void) : _state(S_IDLE), _lastKeyIdx(KEY_IDX_UNDEF)
   setLongPressTime(KEY_LONGPRESS_TIME);
   setRepeatTime(KEY_REPEAT_TIME);
   enableRepeatResult(false);
+  debounce(false, true);    // reset the debounce routine
+  processFSM(false, true);  // reset the FSM
 }
 
 bool MD_UISwitch::debounce(bool curStatus, bool reset)
@@ -63,57 +65,53 @@ bool MD_UISwitch::debounce(bool curStatus, bool reset)
   const uint8_t UTH = 215;      // Upper Threshold  for 'on'
   const uint8_t LTH = 7;        // Lower Threshold for 'off'
   // ---
-  static uint8_t RC = 0;           // RC integrator value
-  static bool prevStatus = false;  // previous 'active' status for edge detection
-
-  static enum { IDLE, DEBOUNCE, WAIT_RELEASE } state = IDLE;
 
   // handle the reset
   if (reset)
   {
-    RC = 0;
-    prevStatus = false;
-    state = IDLE;
+    _RC = 0;
+    _prevStatus = false;
+    _RCstate = S_WAIT_START;
   }
 
-  bool b = prevStatus; // return status value
+  bool b = _prevStatus; // return status value
 
   //edge detector from 'inactive' to 'active'
-  switch (state)
+  switch (_RCstate)
   {
-    case IDLE:      // wait for 'inactive' to 'active' transition
+    case S_WAIT_START: // wait for 'inactive' to 'active' transition
     {
-      if (!prevStatus && curStatus)
-        state = DEBOUNCE;
-      prevStatus = curStatus;
+      if (!_prevStatus && curStatus)
+        _RCstate = S_DEBOUNCE;
+      _prevStatus = curStatus;
     }
     break;
 
-    case DEBOUNCE:  // RC debounce
+    case S_DEBOUNCE:  // RC debounce
     {
       //first compute RCnew = RCold * fraction. Using shift and subtraction.
-      uint8_t temp = RC >> TC_SHIFT;
-      RC = RC - temp;   // subtract fraction for result.
+      uint8_t temp = _RC >> TC_SHIFT;
+      _RC = _RC - temp;   // subtract fraction for result.
 
       if (curStatus)    // still an active switch
-        RC += TC;       // add in the time constant
+        _RC += TC;       // add in the time constant
       else
-        if (RC > 0) RC--; // 'leak' and decay the value
+        if (_RC > 0) _RC--; // 'leak' and decay the value
 
       //check upper & lower threshold.
-      b = (RC > UTH);     // upper threshold means we have a valid result
-      if (b or RC < LTH)  // got result or lower threshold
+      b = (_RC > UTH);     // upper threshold means we have a valid result
+      if (b or _RC < LTH)  // got result or lower threshold
       {
-        RC = 0;               // reset RC value
-        state = WAIT_RELEASE; // move on to next state
+        _RC = 0;               // reset RC value
+        _RCstate = S_WAIT_RELEASE; // move on to next state
       }
     }
     break;
 
-    case WAIT_RELEASE:  // waiting for switch release
+    case S_WAIT_RELEASE:  // waiting for switch release
     default:
     {
-      if (!curStatus) state = IDLE;
+      if (!curStatus) _RCstate = S_WAIT_START;
     }
     break;
   }
@@ -127,21 +125,20 @@ MD_UISwitch::keyResult_t MD_UISwitch::processFSM(bool b, bool reset)
 // Return one of the keypress types depending on what has been detected
 // in the FSM logic
 {
-  static keyResult_t kPush = KEY_NULL;
   keyResult_t k = KEY_NULL;
 
   if (reset)
   {
     _state = S_IDLE;
-    kPush = KEY_NULL;
+    _kPush = KEY_NULL;
     return(k);
   }
 
   // If we have previously pushed something return that status now
-  if (kPush != KEY_NULL)
+  if (_kPush != KEY_NULL)
   {
-    k = kPush;
-    kPush = KEY_NULL;
+    k = _kPush;
+    _kPush = KEY_NULL;
     return(k);
   }
 
@@ -171,7 +168,7 @@ MD_UISwitch::keyResult_t MD_UISwitch::processFSM(bool b, bool reset)
       }
       else      // this is just a press
       {
-        kPush = KEY_PRESS;
+        _kPush = KEY_PRESS;
         _state = S_IDLE;
       }
     }
@@ -205,7 +202,7 @@ MD_UISwitch::keyResult_t MD_UISwitch::processFSM(bool b, bool reset)
     // Set the return code and go back to waiting
     if (!b)
     {
-      kPush = KEY_LONGPRESS;
+      _kPush = KEY_LONGPRESS;
       k = KEY_UP;
       _state = S_IDLE;
       break;
@@ -273,7 +270,7 @@ MD_UISwitch::keyResult_t MD_UISwitch::processFSM(bool b, bool reset)
     if (!b)
     {
       k = KEY_UP;
-      kPush = KEY_DPRESS;
+      _kPush = KEY_DPRESS;
       _state = S_IDLE;
     }
 
@@ -281,7 +278,7 @@ MD_UISwitch::keyResult_t MD_UISwitch::processFSM(bool b, bool reset)
     // and we wait for the key to be released
     if (millis() - _timeActive >= _timePress*2)
     {
-      kPush = KEY_PRESS;
+      _kPush = KEY_PRESS;
       _state = (b) ? S_WAIT : S_IDLE;
     }
     break;
@@ -312,12 +309,7 @@ void MD_UISwitch_Digital::begin(void)
   UI_PRINTS(" pins");
 
   for (uint8_t i = 0; i < _pinCount; i++)
-  {
-    if (_onState == LOW)
-      pinMode(_pins[i], INPUT_PULLUP);
-    else
-      pinMode(_pins[i], INPUT);
-  }
+    pinMode(_pins[i], _onState == LOW ? INPUT_PULLUP : INPUT);
 }
 
 MD_UISwitch::keyResult_t MD_UISwitch_Digital::read(void)

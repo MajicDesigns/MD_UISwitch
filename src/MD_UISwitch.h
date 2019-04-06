@@ -49,6 +49,10 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 \page pageRevisionHistory Revision History
+Apr 2019 version 2.1.0
+- Fixed bugs caused by statics in functions (bad mistake!)
+- Added MultiDigital example
+
 Mar 2019 version 2.0.0
 - Added separate debounce rountine
 - Added Key-UP and KEY_DOWN indicators
@@ -294,7 +298,7 @@ protected:
   *
   * States for the internal Finite State Machine to recognized the key press
   */
-  enum state_t 
+  enum state_fsm 
   { 
     S_IDLE,       ///< Idle state - waiting for key transition
     S_PRESS,      ///< Detecting possible simple press
@@ -305,9 +309,29 @@ protected:
     S_WAIT        ///< Waiting for key to be released after long press is detected
   };
 
-  state_t   _state;       ///< the FSM current state
-  uint32_t  _timeActive;  ///< the millis() time it was last activated
+  // FSM persistent values
+  state_fsm _state;       ///< the FSM current state
+  keyResult_t _kPush;     ///< storage for pushed key in FSM
+  uint32_t  _timeActive;  ///< the millis() time switch was last activated
   uint8_t   _enableFlags; ///< functions enabled/disabled
+
+  /**
+  * Debouncing state values
+  *
+  * States for the internal Debouncing algorithm
+  */
+  enum state_db
+  { 
+    S_WAIT_START,   ///< Waiting for the debouncing to start
+    S_DEBOUNCE,     ///< Currently debouncing state
+    S_WAIT_RELEASE  ///< Waiting for the next transition to be detected
+  };
+
+  // Debouncing persistent values
+  uint8_t _RC = 0;    ///< RC integrator value
+  bool _prevStatus;   ///< previous 'active' status for edge detection
+  state_db _RCstate;  ///< current RC debouning state
+
 
   // Note that Press time < Long Press Time < Repeat time. No checking is done in the
   // library to enforce this relationship.
