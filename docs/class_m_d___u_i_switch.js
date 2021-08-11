@@ -50,5 +50,14 @@ var class_m_d___u_i_switch =
     [ "_timeDoublePress", "class_m_d___u_i_switch.html#a4dc9cf90297ab2a8af69c5a032aa872c", null ],
     [ "_timeLongPress", "class_m_d___u_i_switch.html#a1458feab310d6192e2b397d0015cfd8f", null ],
     [ "_timePress", "class_m_d___u_i_switch.html#a53465ead17577f79bf946ea1be47f654", null ],
-    [ "_timeRepeat", "class_m_d___u_i_switch.html#a4513d97e2bee782f75d72252250e1d6b", null ]
+    [ "_timeRepeat", "class_m_d___u_i_switch.html#a4513d97e2bee782f75d72252250e1d6b", null ],
+    [ "DPRESS_ENABLE", "class_m_d___u_i_switch.html#a002290f239982d77adeb397f9466a457", null ],
+    [ "KEY_ACTIVE_STATE", "class_m_d___u_i_switch.html#aaf410fb990a4021bf95a4e8bf3489a08", null ],
+    [ "KEY_DPRESS_TIME", "class_m_d___u_i_switch.html#a76629bcc4237cfc1566bd5bd65792dbc", null ],
+    [ "KEY_LONGPRESS_TIME", "class_m_d___u_i_switch.html#af45f17963823b2149c0b0d3c9ddd7d8a", null ],
+    [ "KEY_PRESS_TIME", "class_m_d___u_i_switch.html#a1d9d057da84837fa1c431e5d215b6d63", null ],
+    [ "KEY_REPEAT_TIME", "class_m_d___u_i_switch.html#a108bf73743831de600ff69f9da508985", null ],
+    [ "LONGPRESS_ENABLE", "class_m_d___u_i_switch.html#ad053848d2409832412d46042accb76e8", null ],
+    [ "REPEAT_ENABLE", "class_m_d___u_i_switch.html#aeff0768820be6fd3d5b699735f7defff", null ],
+    [ "REPEAT_RESULT_ENABLE", "class_m_d___u_i_switch.html#a8bb598e2f7533b6395ef4b01fc5e83a2", null ]
 ];

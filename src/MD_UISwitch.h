@@ -19,6 +19,7 @@ The library includes the following features:
 
 Switch arrangements handled by the library are:
 - Momentary on type switches (MD_Switch_Digital class)
+- User managed signals eg, I/O expanders (MD_Switch_User class)
 - Analog resistor ladder switches (MD_Switch_Analog class)
 - Keypad matrix (MD_Switch_Matrix class)
 - Keypad matrix using 4017 IC (MD_Matrix_4017KM class)
@@ -49,12 +50,16 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 \page pageRevisionHistory Revision History
+Aug 2021 version 2.2.0
+- Added flexible MD_UISwitch_User type switch
+- Moved constants to inside the class definitions
+
 Apr 2019 version 2.1.0
 - Fixed bugs caused by statics in functions (bad mistake!)
 - Added MultiDigital example
 
 Mar 2019 version 2.0.0
-- Added separate debounce rountine
+- Added separate debounce routine
 - Added Key-UP and KEY_DOWN indicators
 - Replaced setDebounceTime() with setPressTime()
 - Simplified FSM to eliminate FSM debounce code
@@ -78,39 +83,26 @@ Nov 2017 version 1.0.0
  * \brief Main header file and class definition for the MD_UISwitch library.
  */
 
-// Default values for timed events.
-// Note these are all from the same base (ie when the switch is first detected)
-const uint16_t KEY_PRESS_TIME = 150;      ///< Default key press time in milliseconds
-const uint16_t KEY_DPRESS_TIME = 250;     ///< Default double press time between presses in milliseconds
-const uint16_t KEY_LONGPRESS_TIME = 600;  ///< Default long press detection time in milliseconds
-const uint16_t KEY_REPEAT_TIME = 300;     ///< Default time between repeats in in milliseconds
-const uint8_t  KEY_ACTIVE_STATE = LOW;    ///< Default key is active low - transition high to low detection
-
-// Bit enable/disable
-const uint8_t REPEAT_RESULT_ENABLE = 3; ///< Internal status bit to return KS_REPEAT instead of KS_PRESS
-const uint8_t DPRESS_ENABLE = 2;        ///< Internal status bit to enable double press
-const uint8_t LONGPRESS_ENABLE = 1;     ///< Internal status bit to enable long press
-const uint8_t REPEAT_ENABLE = 0;        ///< Internal status bit to enable repeat key
-
-// Miscellaneous defines
-#define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(a) (sizeof(a)/sizeof((a)[0]))
+#endif
 
 /**
- * Core object for the MD_KeySwitch library
+ * Core object for the MD_UISwitch library
  */
 class MD_UISwitch
 {
 public:
   //--------------------------------------------------------------
   /** \name Enumerated values and Typedefs.
-  * @{
-  */
+   * @{
+   */
   /**
-  * Return values for switch status
-  *
-  * The read() method returns one of these enumerated values as the
-  * result of the switch transition detection.
-  */
+   * Return values for switch status
+   *
+   * The read() method returns one of these enumerated values as the
+   * result of the switch transition detection.
+   */
   enum keyResult_t
   {
     KEY_NULL,        ///< No key press
@@ -125,8 +117,8 @@ public:
 
   //--------------------------------------------------------------
   /** \name Class constructor and destructor.
-  * @{
-  */
+   * @{
+   */
   /**
    * Class Constructor.
    *
@@ -293,7 +285,21 @@ public:
   /** @} */
 
 protected:
-  /**
+  // Default values for timed events.
+  // Note these are all from the same base (ie when the switch is first detected)
+  static const uint16_t KEY_PRESS_TIME = 150;      ///< Default key press time in milliseconds
+  static const uint16_t KEY_DPRESS_TIME = 250;     ///< Default double press time between presses in milliseconds
+  static const uint16_t KEY_LONGPRESS_TIME = 600;  ///< Default long press detection time in milliseconds
+  static const uint16_t KEY_REPEAT_TIME = 300;     ///< Default time between repeats in in milliseconds
+  static const uint8_t  KEY_ACTIVE_STATE = LOW;    ///< Default key is active low - transition high to low detection
+
+  // Bit enable/disable
+  static const uint8_t REPEAT_RESULT_ENABLE = 3; ///< Internal status bit to return KS_REPEAT instead of KS_PRESS
+  static const uint8_t DPRESS_ENABLE = 2;        ///< Internal status bit to enable double press
+  static const uint8_t LONGPRESS_ENABLE = 1;     ///< Internal status bit to enable long press
+  static const uint8_t REPEAT_ENABLE = 0;        ///< Internal status bit to enable repeat key
+
+ /**
   * FSM state values
   *
   * States for the internal Finite State Machine to recognized the key press
@@ -401,7 +407,7 @@ public:
   * Class Constructor - simple pin.
   *
   * Instantiate a new instance of the class. The parameters passed are
-  * used to the hardware interface to the switch.
+  * used to define the hardware interface to the switch.
   *
   * This form of the constructor is for a simple digital pin (ie,
   * one digital pin). 
@@ -422,7 +428,7 @@ public:
   * Class Constructor - array of pins.
   *
   * Instantiate a new instance of the class. The parameters passed are
-  * used to the hardware interface to the switch.
+  * used to define the hardware interface to the switch.
   *
   * This form of the constructor is for an array of digital pins. The
   * data is not copied from the user code, so the array elements need
@@ -481,6 +487,108 @@ protected:
   uint8_t   *_pins;     ///< pointer to data for one or more pins
   uint8_t   _pinCount;  ///< number of pins defined
   uint8_t   _onState;   ///< digital state for ON
+};
+
+/**
+* Extension class MD_UISwitch_User.
+*
+* Implements interface for user defined digital values. This provides the application
+* flexibility to implement switches through I/O extenders and still maintain the same
+* UISwitch interface.
+*
+* When the current digital value is required a user defined callback function will be 
+* invoked to return the current active state of the digital I/O identified by specific
+* id. This works very similar to the MD_UISwitch_Digital class but without direct I/O 
+* access.
+*/
+class MD_UISwitch_User : public MD_UISwitch
+{
+public:
+  //--------------------------------------------------------------
+ /**
+  * User data function prototype
+  *
+  * The user data is returned from a callback function. The function must 
+  * return the current value (true if the switch is active, false otherwise) of 
+  * the digital identified by id.
+  */
+  typedef bool(*cbUserData)(uint8_t id);
+
+  /** \name Class constructor and destructor.
+  * @{
+  */
+  /**
+  * Class Constructor - single id.
+  *
+  * Instantiate a new instance of the class. The parameters passed are
+  * used to define the interface to the switch.
+  *
+  * This form of the constructor is for a single digital id (ie,
+  * one switch).
+  *
+  * \param id   the switch identifier for this switch
+  * \param cb   the callback to obtain the digital data state
+  */
+  MD_UISwitch_User(uint8_t id, cbUserData cb) :
+    _idSimple(id), _ids(&_idSimple), _idCount(1), _cb(cb) {};
+
+  /**
+  * Class Constructor - array of id.
+  *
+  * Instantiate a new instance of the class. The parameters passed are
+  * used to the interface hardware to the switch.
+  *
+  * This form of the constructor is for an array of digital ids. The
+  * data is not copied from the user code, so the array elements need
+  * to remain in scope and constant for the life of the object.
+  *
+  * \param ids      pointer to array of switch identifiers for these switches
+  * \param idCount  the number of id in the ids[] array
+  * \param cb       the callback to obtain the digital data state
+  */
+  MD_UISwitch_User(uint8_t* ids, uint8_t idCount, cbUserData cb) :
+    _ids(ids), _idCount(idCount), _cb(cb) {};
+
+  /**
+  * Class Destructor.
+  *
+  * Release allocated memory and does the necessary to clean up once the queue is
+  * no longer required.
+  */
+  ~MD_UISwitch_User() {};
+
+  /** @} */
+  //--------------------------------------------------------------
+  /** \name Methods for core object control.
+  * @{
+  */
+  /**
+  * Initialize the object.
+  *
+  * Initialise the object data. This needs to be called during setup() to initialize new
+  * data for the class that cannot be done during the object creation.
+  */
+  virtual void begin(void);
+
+  /**
+  * Return the state of the switch
+  *
+  * Return one of the keypress types depending on what has been detected.
+  * The timing for each keypress starts when the first transition of the
+  * switch from inactive to active state and is recognized by a finite
+  * state machine whose operation is directed by the timer and option
+  * values specified.
+  *
+  * \return one of the keyResult_t enumerated values
+  */
+  virtual keyResult_t read(void);
+  /** @} */
+
+protected:
+  uint8_t   _idSimple; ///< number for simple id
+  uint8_t*  _ids;      ///< pointer to data for one or more ids
+  uint8_t   _idCount;  ///< number of ids defined
+  cbUserData _cb;      ///< callback to obtain user digital data
 };
 
 /**

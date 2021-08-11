@@ -1,5 +1,7 @@
 ## MD_UISwitch Universal User Interface Switch Library
 
+[![arduino-library-badge](https://www.ardu-badge.com/badge/MD_UISwitch.svg?)](https://www.ardu-badge.com/MD_UISwitch)
+
 This library uniformly encapsulates the use of different types of switches 
 for user input devices. The library is easily extended for additional 
 switch types through a class hierarchy and inheritance model, following 
@@ -13,6 +15,7 @@ The library includes the following features:
 
 Switch arrangements handled by the library are:
 - Momentary on type switches (MD_Switch_Digital class)
+- User managed signals eg, I/O expanders (MD_Switch_User class)
 - Analog resistor ladder switches (MD_Switch_Analog class)
 - Keypad matrix (MD_Switch_Matrix class)
 - Keypad matrix using 4017 IC (MD_Matrix_4017KM class)

@@ -8,6 +8,7 @@
 
 MD_UISwitch	KEYWORD1
 MD_UISwitch_Digital	KEYWORD1
+MD_UISwitch_User	KEYWORD1
 MD_UISwitch_Analog	KEYWORD1
 MD_UISwitch_Matrix	KEYWORD1
 MD_UISwitch_4017KM	KEYWORD1

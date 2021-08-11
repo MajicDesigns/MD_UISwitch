@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['longpress_5fenable',['LONGPRESS_ENABLE',['../_m_d___u_i_switch_8h.html#ae624d1696ade653ff7302c5d6a8055e0',1,'MD_UISwitch.h']]]
+  ['longpress_5fenable_59',['LONGPRESS_ENABLE',['../class_m_d___u_i_switch.html#ad053848d2409832412d46042accb76e8',1,'MD_UISwitch']]]
 ];

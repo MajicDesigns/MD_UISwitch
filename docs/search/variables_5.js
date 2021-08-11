@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['repeat_5fenable',['REPEAT_ENABLE',['../_m_d___u_i_switch_8h.html#a30909fe7f296d7a592876e8f23673801',1,'MD_UISwitch.h']]],
-  ['repeat_5fresult_5fenable',['REPEAT_RESULT_ENABLE',['../_m_d___u_i_switch_8h.html#ae64d8ab4bff3ff8fe3474b9e722c6543',1,'MD_UISwitch.h']]]
+  ['repeat_5fenable_181',['REPEAT_ENABLE',['../class_m_d___u_i_switch.html#aeff0768820be6fd3d5b699735f7defff',1,'MD_UISwitch']]],
+  ['repeat_5fresult_5fenable_182',['REPEAT_RESULT_ENABLE',['../class_m_d___u_i_switch.html#a8bb598e2f7533b6395ef4b01fc5e83a2',1,'MD_UISwitch']]]
 ];

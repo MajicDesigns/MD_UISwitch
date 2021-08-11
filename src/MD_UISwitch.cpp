@@ -346,6 +346,48 @@ MD_UISwitch::keyResult_t MD_UISwitch_Digital::read(void)
 // -----------------------------------------------
 
 // -----------------------------------------------
+// MD_UISwitch_User methods
+// -----------------------------------------------
+void MD_UISwitch_User::begin(void)
+{
+  UI_PRINT("\nUISwitch_User begin() ", _idCount);
+  UI_PRINTS(" ids");
+}
+
+MD_UISwitch::keyResult_t MD_UISwitch_User::read(void)
+{
+  bool b = false;
+  int16_t idx = KEY_IDX_UNDEF;
+  int16_t count = 0;
+
+  // work out which key is pressed
+  for (uint8_t i = 0; i < _idCount; i++)
+  {
+    if (_cb(_ids[i]))
+    {
+      if (idx == KEY_IDX_UNDEF) idx = i;  // only record the first one
+      count++;
+    }
+  }
+
+  // if more than one key pressed, don't count anything
+  if (count == 1)   // we have a valid key
+  {
+    // is this the same as the previous key?
+    if (idx != _lastKeyIdx) processFSM(debounce(false, true), true); // reset the debounce and FSM
+
+    b = (idx == _lastKeyIdx);
+    _lastKeyIdx = idx;
+    _lastKey = _ids[idx];
+    //UI_PRINT("\nKey idx ", _lastKeyIdx);
+    //UI_PRINT(" value ", _lastKey);
+  }
+
+  return(processFSM(debounce(b)));
+}
+// -----------------------------------------------
+
+// -----------------------------------------------
 // MD_UISwitch_Analog methods
 // -----------------------------------------------
 void MD_UISwitch_Analog::begin(void)
