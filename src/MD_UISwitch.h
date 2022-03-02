@@ -444,7 +444,7 @@ public:
   * \param pinCount  the number of pin in the pins[] array
   * \param onState   the state for the switch to be active
   */
-  MD_UISwitch_Digital(uint8_t *pins, uint8_t pinCount, uint8_t onState = KEY_ACTIVE_STATE) :
+  MD_UISwitch_Digital(const uint8_t *pins, uint8_t pinCount, uint8_t onState = KEY_ACTIVE_STATE) :
     _pins(pins), _pinCount(pinCount), _onState(onState) {};
 
   /**
@@ -483,10 +483,10 @@ public:
   /** @} */
 
 protected:
-  uint8_t   _pinSimple; ///< pin number for simple pins
-  uint8_t   *_pins;     ///< pointer to data for one or more pins
-  uint8_t   _pinCount;  ///< number of pins defined
-  uint8_t   _onState;   ///< digital state for ON
+  uint8_t       _pinSimple; ///< pin number for simple pins
+  const uint8_t *_pins;     ///< pointer to data for one or more pins
+  uint8_t       _pinCount;  ///< number of pins defined
+  uint8_t       _onState;   ///< digital state for ON
 };
 
 /**
