@@ -50,6 +50,9 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 \page pageRevisionHistory Revision History
+Apr 2022 version 2.2.1
+- Added Concurrent example
+
 Aug 2021 version 2.2.0
 - Added flexible MD_UISwitch_User type switch
 - Moved constants to inside the class definitions

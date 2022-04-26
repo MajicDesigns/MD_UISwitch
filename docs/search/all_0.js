@@ -19,7 +19,7 @@ var searchData=
   ['_5fpincount_16',['_pinCount',['../class_m_d___u_i_switch___digital.html#ac09e151823e20ca64eb78dd78cd98111',1,'MD_UISwitch_Digital']]],
   ['_5fpinkey_17',['_pinKey',['../class_m_d___u_i_switch__4017_k_m.html#a5fd43df6b8a256bf29dd28796f8a3d29',1,'MD_UISwitch_4017KM']]],
   ['_5fpinrst_18',['_pinRst',['../class_m_d___u_i_switch__4017_k_m.html#a946c8322ba386a61beaead275b70b0fc',1,'MD_UISwitch_4017KM']]],
-  ['_5fpins_19',['_pins',['../class_m_d___u_i_switch___digital.html#a7ac21014a5660ce69ff7012ed322a6f0',1,'MD_UISwitch_Digital']]],
+  ['_5fpins_19',['_pins',['../class_m_d___u_i_switch___digital.html#afb33323e43dfe4d0d8430a808ea7e30f',1,'MD_UISwitch_Digital']]],
   ['_5fpinsimple_20',['_pinSimple',['../class_m_d___u_i_switch___digital.html#a1e16feab3856907164eb681e492d7c87',1,'MD_UISwitch_Digital']]],
   ['_5fprevstatus_21',['_prevStatus',['../class_m_d___u_i_switch.html#a3fab36509ef0f309e76e0c30c8438c40',1,'MD_UISwitch']]],
   ['_5frc_22',['_RC',['../class_m_d___u_i_switch.html#af12270236bff624e753fb36761e474f7',1,'MD_UISwitch']]],
