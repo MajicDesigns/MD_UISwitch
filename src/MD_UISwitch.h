@@ -50,6 +50,11 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 \page pageRevisionHistory Revision History
+Jul 2022 version 2.2.2
+- Fixed bug in matrix lookup index calculation
+- Added SimpleKbd example
+- Documentation updates and fixes
+
 Apr 2022 version 2.2.1
 - Added Concurrent example
 
@@ -392,7 +397,7 @@ protected:
 *
 * Implements interface for momentary ON switches, such as tact switches or micro-switches.
 *
-* ![Momentary On Digital Style Switches] (Digital_Switches.jpg "Digital Switches")
+* \image{inline} html Digital_Switches.jpg "Digital Switches"
 *
 * Switches can be wired as pull-up or pull-down. Pull-up switches are initialized 
 * with the internal pull-up enabled. Pull-down switches require an external 
@@ -417,7 +422,7 @@ public:
   *
   * The option parameter onState tells the library which level
   * (LOW or HIGH) should be considered the switch 'on' state. If the
-  * default LOW state is selected then the library will initialise the
+  * default LOW state is selected then the library will initialize the
   * pin with INPUT_PULLUP and no external pullup resistors are necessary.
   * If specified HIGH, external pull down resistors will be required.
   *
@@ -466,7 +471,7 @@ public:
   /**
   * Initialize the object.
   *
-  * Initialise the object data. This needs to be called during setup() to initialize new
+  * Initialize the object data. This needs to be called during setup() to initialize new
   * data for the class that cannot be done during the object creation.
   */
   virtual void begin(void);
@@ -568,7 +573,7 @@ public:
   /**
   * Initialize the object.
   *
-  * Initialise the object data. This needs to be called during setup() to initialize new
+  * Initialize the object data. This needs to be called during setup() to initialize new
   * data for the class that cannot be done during the object creation.
   */
   virtual void begin(void);
@@ -600,7 +605,7 @@ protected:
 * Implements resistor ladder switches on analog input. This type of switch
 * are typically found on 1602 LCD module shields.
 *
-* ![LCD Shield Analog Style Switches] (lcd_shield.jpg "LCD Shield")
+* image{inline} html lcd_shield.jpg "LCD Shield"
 *
 * All the switches are wired to one analog input, generally with resistor values 
 * as shown in the circuit below. The switch pressed is determined
@@ -608,7 +613,7 @@ protected:
 * implementation of the resistor, so a translation table is implemented to allow
 * the remapping of the analog value to a key number.
 *
-* ![LCD Shield Switches Circuit] (lcd_switch_ladder.png "Analog Ladder Circuit")
+* \image{inline} html lcd_switch_ladder.png "Analog Ladder Circuit"
 *
 * The translation table must be determined separately and passed as a parameter to 
 * the class constructor - the utility application Test_Analog_Keys in the examples 
@@ -673,7 +678,7 @@ public:
   /**
   * Initialize the object.
   *
-  * Initialise the object data. This needs to be called during setup() to initialize new
+  * Initialize the object data. This needs to be called during setup() to initialize new
   * data for the class that cannot be done during the object creation.
   */
   virtual void begin(void);
@@ -705,7 +710,7 @@ protected:
 *
 * Implements keyboard matrix switches that need to be scanned to detect a keypress.
 *
-* ![Keypad Style Switches] (Keypad_Switches.jpg "Keypad Switches")
+* \image{inline} html Keypad_Switches.jpg "Keypad Switches"
 *
 * The class will scan a key matrix that typically have circuits and connections 
 * similar to that shown below. Each row and column is separately connected to a 
@@ -715,7 +720,7 @@ protected:
 * resistors. The library does not make a copy of the pin arrays so they should 
 * remain in scope for the life of the object.
 *
-* ![4x4 Matrix Keypad Circuit] (Keypad_Circuit_4x4.jpg "Keypad Circuit")
+* \image{inline} html Keypad_Circuit_4x4.jpg "Keypad Circuit"
 *
 * The class will only return a valid key press if only one key is pressed. If 
 * more than one key is pressed simultaneously, all the keys are ignored until
@@ -799,7 +804,7 @@ protected:
 * Implements keyboard matrix switches implemented using 4017 decade counter
 * (see https://arduinoplusplus.wordpress.com/2016/02/17/up-to-100-switches-with-3-digital-pins/).
 *
-* ![Key Matrix using 4017 IC] (Matrix_4017_KM.jpg "Key Matrix 4017")
+* \image{inline} html Matrix_4017_KM.jpg "Key Matrix 4017"
 *
 * Using a 4017 IC, this class implements a method for reading many open/closed switches
 * using only three digital I/O pins (Clock, Reset and DataIn). The class will scan a key 

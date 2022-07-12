@@ -16,8 +16,8 @@ const int16_t KEY_IDX_UNDEF = -1;   ///< Index value for undefined index
 #define UI_DEBUG 0  ///< Library debugging flag
 
 #if UI_DEBUG
-#define UI_PRINTS(s)   { Serial.print(F(s)); }                  ///< Debugging macro
-#define UI_PRINT(s, v) { Serial.print(F(s)); Serial.print(v); } ///< Debugging macro
+#define UI_PRINTS(s)   do { Serial.print(F(s)); } while (false)                  ///< Debugging macro
+#define UI_PRINT(s, v) do { Serial.print(F(s)); Serial.print(v); } while (false) ///< Debugging macro
 #else
 #define UI_PRINTS(s)    ///< Debugging macro
 #define UI_PRINT(s, v)  ///< Debugging macro
@@ -461,8 +461,11 @@ MD_UISwitch::keyResult_t MD_UISwitch_Matrix::read(void)
     {
       if (digitalRead(_rowPin[r]) == LOW)
       {
-        if (idx == KEY_IDX_UNDEF) idx = (r * _rows) + c;
+        if (idx == KEY_IDX_UNDEF) idx = (r * _cols) + c;
         count++;
+        UI_PRINT("\nC:", c);
+        UI_PRINT(" R:", r);
+        UI_PRINT(" idx:", idx);
       }
     }
     digitalWrite(_colPin[c], HIGH);     // end column pulse
